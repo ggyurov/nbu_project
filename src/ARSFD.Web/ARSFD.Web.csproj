@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ARSFD.Database\ARSFD.Database.csproj" />
     <ProjectReference Include="..\ARSFD.Services\ARSFD.Services.csproj" />
   </ItemGroup>
 
