@@ -1,11 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2005
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6391DF91-46CF-4E61-A3A6-F7E8DD3A765D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{5DE900BE-46A0-4F15-A684-9948CD270FC7}"
+	ProjectSection(SolutionItems) = preProject
+		docs\CSCB024_Appointment_reservation_system_for_dentists.pdf = docs\CSCB024_Appointment_reservation_system_for_dentists.pdf
+		DATABASE.md = DATABASE.md
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{437FCD58-D0BF-479C-800F-71F653AA8937}"
 	ProjectSection(SolutionItems) = preProject
@@ -16,11 +20,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ARSFD.Web", "src\ARSFD.Web\ARSFD.Web.csproj", "{638F676F-5759-4E05-A6D8-4C0B14A8F0B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ARSFD.Database", "src\ARSFD.Database\ARSFD.Database.csproj", "{F562F23D-431A-4056-9C08-56C8232B7B00}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ARSFD.Database", "src\ARSFD.Database\ARSFD.Database.csproj", "{F562F23D-431A-4056-9C08-56C8232B7B00}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ARSFD.Services", "src\ARSFD.Services\ARSFD.Services.csproj", "{91479AA8-3BA1-4CBF-85F0-2DB87FA4446E}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ARSFD.Database.Impl", "src\ARSFD.Database.Impl\ARSFD.Database.Impl.csproj", "{A5BC9C05-76FA-4F8C-9413-AA59B26F4288}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ARSFD.Services", "src\ARSFD.Services\ARSFD.Services.csproj", "{91479AA8-3BA1-4CBF-85F0-2DB87FA4446E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ARSFD.Services.Impl", "src\ARSFD.Services.Impl\ARSFD.Services.Impl.csproj", "{A78C8A2D-5296-4F55-9B0B-B90703C172EC}"
 EndProject
@@ -42,10 +44,6 @@ Global
 		{91479AA8-3BA1-4CBF-85F0-2DB87FA4446E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91479AA8-3BA1-4CBF-85F0-2DB87FA4446E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91479AA8-3BA1-4CBF-85F0-2DB87FA4446E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A5BC9C05-76FA-4F8C-9413-AA59B26F4288}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A5BC9C05-76FA-4F8C-9413-AA59B26F4288}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A5BC9C05-76FA-4F8C-9413-AA59B26F4288}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A5BC9C05-76FA-4F8C-9413-AA59B26F4288}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A78C8A2D-5296-4F55-9B0B-B90703C172EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A78C8A2D-5296-4F55-9B0B-B90703C172EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A78C8A2D-5296-4F55-9B0B-B90703C172EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -58,7 +56,6 @@ Global
 		{638F676F-5759-4E05-A6D8-4C0B14A8F0B6} = {6391DF91-46CF-4E61-A3A6-F7E8DD3A765D}
 		{F562F23D-431A-4056-9C08-56C8232B7B00} = {6391DF91-46CF-4E61-A3A6-F7E8DD3A765D}
 		{91479AA8-3BA1-4CBF-85F0-2DB87FA4446E} = {6391DF91-46CF-4E61-A3A6-F7E8DD3A765D}
-		{A5BC9C05-76FA-4F8C-9413-AA59B26F4288} = {6391DF91-46CF-4E61-A3A6-F7E8DD3A765D}
 		{A78C8A2D-5296-4F55-9B0B-B90703C172EC} = {6391DF91-46CF-4E61-A3A6-F7E8DD3A765D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
