@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace ARSFD.Web.Services
 {
-    public interface IEmailSender
-    {
-        Task SendEmailAsync(string email, string subject, string message);
-    }
+	public interface IEmailSender
+	{
+		Task SendEmailAsync(string email, string subject, string message);
+	}
 }

@@ -27,11 +27,11 @@ namespace ARSFD.Web.Controllers
 		private const string AuthenicatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
 		public ManageController(
-		  UserManager<ApplicationUser> userManager,
-		  SignInManager<ApplicationUser> signInManager,
-		  IEmailSender emailSender,
-		  ILogger<ManageController> logger,
-		  UrlEncoder urlEncoder)
+			UserManager<ApplicationUser> userManager,
+			SignInManager<ApplicationUser> signInManager,
+			IEmailSender emailSender,
+			ILogger<ManageController> logger,
+			UrlEncoder urlEncoder)
 		{
 			_userManager = userManager;
 			_signInManager = signInManager;
