@@ -1,4 +1,4 @@
-﻿using ARSFD.Database;
+﻿using ARSFD.Services.Impl;
 using ARSFD.Web.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using DATABASE = ARSFD.Database;
+using SERVICES = ARSFD.Services;
 
 namespace ARSFD.Web
 {
@@ -20,14 +22,16 @@ namespace ARSFD.Web
 
 		public void ConfigureServices(IServiceCollection services)
 		{
-			services.AddDbContext<ApplicationDbContext>(options =>
+			services.AddDbContext<DATABASE.ApplicationDbContext>(options =>
 				options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-			services.AddIdentity<ApplicationUser, ApplicationRole>()
-				.AddEntityFrameworkStores<ApplicationDbContext>()
+			services.AddIdentity<DATABASE.ApplicationUser, DATABASE.ApplicationRole>()
+				.AddEntityFrameworkStores<DATABASE.ApplicationDbContext>()
 				.AddDefaultTokenProviders();
 
 			services.AddTransient<IEmailSender, EmailSender>();
+
+			services.AddScoped<SERVICES.IAppointmentService, AppointmentService>();
 
 			services.AddMvc();
 		}

@@ -8,7 +8,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{5DE900BE-46A0-4F15-A684-9948CD270FC7}"
 	ProjectSection(SolutionItems) = preProject
 		docs\CSCB024_Appointment_reservation_system_for_dentists.pdf = docs\CSCB024_Appointment_reservation_system_for_dentists.pdf
-		DATABASE.md = DATABASE.md
+		docs\DATABASE.md = docs\DATABASE.md
+		docs\NOTES.md = docs\NOTES.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{437FCD58-D0BF-479C-800F-71F653AA8937}"
