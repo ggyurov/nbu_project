@@ -7,6 +7,14 @@ namespace ARSFD.Database
 {
 	public class ApplicationDbContext: IdentityDbContext<ApplicationUser, ApplicationRole, string>
 	{
+		public DbSet<Appointment> Appointments { get; set; }
+
+		public DbSet<Rating> Ratings { get; set; }
+
+		public DbSet<Comment> Comments { get; set; }
+
+		public DbSet<Event> Events { get; set; }
+
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
 			: base(options)
 		{
@@ -196,6 +204,80 @@ namespace ARSFD.Database
 					.HasName("UserNameIndex");
 
 				b.ToTable("Users");
+			});
+
+			#endregion
+
+			#region ARSFD models
+
+			modelBuilder.Entity<Appointment>(b =>
+			{
+				b.Property(x => x.Id);
+
+				b.Property(x => x.UserId);
+
+				b.Property(x => x.Date);
+
+				b.Property(x => x.DoctorId);
+
+				b.Property(x => x.CanceledById);
+
+				b.Property(x => x.CanceledOn);
+
+				b.HasKey(x => x.Id);
+
+				b.ToTable("Appointments");
+			});
+
+			modelBuilder.Entity<Rating>(b =>
+			{
+				b.Property(x => x.Id);
+
+				b.Property(x => x.UserId);
+
+				b.Property(x => x.ByUserId);
+
+				b.Property(x => x.Value);
+
+				b.HasKey(x => x.Id);
+
+				b.ToTable("Ratings");
+			});
+
+			modelBuilder.Entity<Comment>(b =>
+			{
+				b.Property(x => x.Id);
+
+				b.Property(x => x.Text);
+
+				b.Property(x => x.ByUserId);
+
+				b.Property(x => x.UserId);
+
+				b.Property(x => x.EventId);
+
+				b.HasKey(x => x.Id);
+
+				b.ToTable("Comments");
+			});
+
+			modelBuilder.Entity<Event>(b =>
+			{
+				b.Property(x => x.Id);
+
+				b.Property(x => x.UserId);
+
+				b.Property(x => x.Title);
+
+				b.Property(x => x.Text);
+
+				b.Property(x => x.StartDate);
+
+				b.Property(x => x.EndDate);
+
+				b.HasKey(x => x.Id);
+
+				b.ToTable("Events");
 			});
 
 			#endregion
