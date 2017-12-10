@@ -4,7 +4,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
--- TODO: Foreign keys
+-- APPOINTMENTS table
 CREATE TABLE [dbo].[Appointments]
 (
 	[Id] INT IDENTITY(1,1) NOT NULL,
@@ -28,7 +28,34 @@ CONSTRAINT [PK_Appointments] PRIMARY KEY CLUSTERED
 )
 GO
 
--- TODO: Foreign keys
+ALTER TABLE [dbo].[Appointments] WITH CHECK
+ADD CONSTRAINT [FK_Appointments_Users_UserId] FOREIGN KEY ([UserId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+
+ALTER TABLE [dbo].[Appointments]
+CHECK CONSTRAINT [FK_Appointments_Users_UserId]
+GO
+
+ALTER TABLE [dbo].[Appointments] WITH CHECK
+ADD CONSTRAINT [FK_Appointments_Users_DoctorId] FOREIGN KEY ([DoctorId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+
+ALTER TABLE [dbo].[Appointments]
+CHECK CONSTRAINT [FK_Appointments_Users_DoctorId]
+GO
+
+ALTER TABLE [dbo].[Appointments] WITH CHECK
+ADD CONSTRAINT [FK_Appointments_Users_CanceledById] FOREIGN KEY ([CanceledById])
+REFERENCES [dbo].[Users] ([Id])
+GO
+
+ALTER TABLE [dbo].[Appointments]
+CHECK CONSTRAINT [FK_Appointments_Users_CanceledById]
+GO
+
+-- RATINGS table
 CREATE TABLE [dbo].[Ratings]
 (
 	[Id] INT IDENTITY(1,1) NOT NULL,
@@ -50,7 +77,25 @@ CONSTRAINT [PK_Ratings] PRIMARY KEY CLUSTERED
 )
 GO
 
--- TODO: Foreign keys
+ALTER TABLE [dbo].[Ratings] WITH CHECK
+ADD CONSTRAINT [FK_Ratings_Users_UserId] FOREIGN KEY ([UserId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+
+ALTER TABLE [dbo].[Ratings]
+CHECK CONSTRAINT [FK_Ratings_Users_UserId]
+GO
+
+ALTER TABLE [dbo].[Ratings] WITH CHECK
+ADD CONSTRAINT [FK_Ratings_Users_ByUserId] FOREIGN KEY ([ByUserId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+
+ALTER TABLE [dbo].[Ratings]
+CHECK CONSTRAINT [FK_Ratings_Users_ByUserId]
+GO
+
+-- COMMENTS table
 CREATE TABLE [dbo].[Comments]
 (
 	[Id] INT IDENTITY(1,1) NOT NULL,
@@ -73,7 +118,34 @@ CONSTRAINT [PK_Comments] PRIMARY KEY CLUSTERED
 )
 GO
 
--- TODO: Foreign keys
+ALTER TABLE [dbo].[Comments] WITH CHECK
+ADD CONSTRAINT [FK_Comments_Users_UserId] FOREIGN KEY ([UserId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+
+ALTER TABLE [dbo].[Comments]
+CHECK CONSTRAINT [FK_Comments_Users_UserId]
+GO
+
+ALTER TABLE [dbo].[Comments] WITH CHECK
+ADD CONSTRAINT [FK_Comments_Users_ByUserId] FOREIGN KEY ([ByUserId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+
+ALTER TABLE [dbo].[Comments]
+CHECK CONSTRAINT [FK_Comments_Users_ByUserId]
+GO
+
+ALTER TABLE [dbo].[Comments] WITH CHECK
+ADD CONSTRAINT [FK_Comments_Events_EventId] FOREIGN KEY ([EventId])
+REFERENCES [dbo].[Events] ([Id])
+GO
+
+ALTER TABLE [dbo].[Comments]
+CHECK CONSTRAINT [FK_Comments_Events_EventId]
+GO
+
+-- EVENTS table
 CREATE TABLE [dbo].[Events]
 (
 	[Id] INT IDENTITY(1,1) NOT NULL,
@@ -95,4 +167,13 @@ CONSTRAINT [PK_Events] PRIMARY KEY CLUSTERED
 		ALLOW_PAGE_LOCKS = ON
 	) ON [PRIMARY]
 )
+GO
+
+ALTER TABLE [dbo].[Events] WITH CHECK
+ADD CONSTRAINT [FK_Events_Users_UserId] FOREIGN KEY ([UserId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+
+ALTER TABLE [dbo].[Events]
+CHECK CONSTRAINT [FK_Events_Users_UserId]
 GO
