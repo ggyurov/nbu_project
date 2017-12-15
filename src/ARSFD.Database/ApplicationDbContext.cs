@@ -194,6 +194,9 @@ namespace ARSFD.Database
 				b.Property<string>("UserName")
 					.HasAnnotation("MaxLength", 256);
 
+				b.Property<string>("City")
+					.HasAnnotation("MaxLength", 32);
+
 				b.HasKey("Id");
 
 				b.HasIndex("NormalizedEmail")
