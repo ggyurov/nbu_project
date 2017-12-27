@@ -15,5 +15,25 @@ namespace ARSFD.Services
 		public string CanceledById { get; set; }
 
 		public DateTime? CanceledOn { get; set; }
+
+		public Appointment()
+		{
+
+		}
+
+		public Appointment(Database.Appointment appointment)
+		{
+			if (appointment == null)
+			{
+				throw new ArgumentNullException(nameof(appointment));
+			}
+
+			Id = appointment.Id;
+			UserId = appointment.UserId;
+			Date = appointment.Date;
+			DoctorId = appointment.DoctorId;
+			CanceledById = appointment.CanceledById;
+			CanceledOn = appointment.CanceledOn;
+		}
 	}
 }

@@ -15,5 +15,16 @@
 		/// Gets or sets the items in the result.
 		/// </summary>
 		public T[] Items { get; set; }
+
+		public FindResult()
+		{
+
+		}
+
+		public FindResult(T[] items)
+		{
+			Items = items;
+			TotalCount = items.Length;
+		}
 	}
 }
