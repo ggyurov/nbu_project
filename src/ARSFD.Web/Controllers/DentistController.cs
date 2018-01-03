@@ -1,18 +1,20 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using ARSFD.Web.Models.DentistViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ARSFD.Web.Controllers
 {
 	[Route("dentist")]
+	[Authorize(Roles = "Patient")]
 	public class DentistController : Controller
 	{
 		[HttpGet]
 		[Route("")]
 		public IActionResult Index(
-			[FromQuery(Name ="Name")] string name, 
-			[FromQuery(Name = "City")] string city, 
+			[FromQuery(Name = "Name")] string name,
+			[FromQuery(Name = "City")] string city,
 			[FromQuery(Name = "Type")] string type,
 			[FromQuery(Name = "Rating")] string rating)
 		{
@@ -26,7 +28,7 @@ namespace ARSFD.Web.Controllers
 
 		[Route("{id}")]
 		public async Task<IActionResult> Single(
-			[FromRoute(Name ="id")] string id,
+			[FromRoute(Name = "id")] string id,
 			CancellationToken cancellationToken)
 		{
 

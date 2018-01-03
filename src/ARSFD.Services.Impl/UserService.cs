@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +7,7 @@ using DATABASE = ARSFD.Database;
 
 namespace ARSFD.Services.Impl
 {
-	public class UserService: IUserService
+	public class UserService : IUserService
 	{
 		private DATABASE.ApplicationDbContext _context;
 
@@ -176,7 +177,64 @@ namespace ARSFD.Services.Impl
 			}
 		}
 
+		public async Task<ApplicationUser[]> Find(string name, string city, string type, double? rating, CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				IQueryable<DATABASE.ApplicationUser> users = _context.Users;
+
+				if (name != null)
+				{
+					//users.Where(x => x.Name == name);
+				}
+				if (city != null)
+				{
+					users.Where(x => x.City.Contains(city));
+				}
+				if (type != null)
+				{
+					//users.Where(x => x.Type.Contains(type));
+				}
+				if (rating != null)
+				{
+					users = (
+						from u in users
+						join ur in _context.Ratings
+							on u.Id equals ur.UserId
+						where ur.Value >= rating
+						select u);
+				}
+
+				return await users.Select(x => ConvertUser(x)).ToArrayAsync(cancellationToken);
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceException($"Failed to get users", ex);
+			}
+		}
+
 		#endregion
+
+		private static ApplicationUser ConvertUser(DATABASE.ApplicationUser value)
+		{
+			ApplicationRole role = ConvertRole(value.Role);
+
+			var user = new ApplicationUser
+			{
+				Id = value.Id,
+				City = value.City,
+				Email = value.Email,
+				EmailConfirmed = value.EmailConfirmed,
+				PasswordHash = value.PasswordHash,
+				UserName = value.UserName,
+				NormalizedUserName = value.NormalizedUserName,
+				Role = role,
+				Name = value.Name,
+				Type = value.Type,
+			};
+
+			return user;
+		}
 
 		private static DATABASE.ApplicationRole ConvertRole(ApplicationRole value)
 		{
