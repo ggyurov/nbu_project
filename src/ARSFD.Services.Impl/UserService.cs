@@ -177,32 +177,41 @@ namespace ARSFD.Services.Impl
 			}
 		}
 
-		public async Task<ApplicationUser[]> Find(string name, string city, string type, double? rating, CancellationToken cancellationToken = default)
+		public async Task<ApplicationUser[]> FindDentists(string name, string city, string type, double? rating, CancellationToken cancellationToken = default)
 		{
 			try
 			{
-				IQueryable<DATABASE.ApplicationUser> users = _context.Users;
+				IQueryable<DATABASE.ApplicationUser> users = _context.Users.Where(x => x.Role == DATABASE.ApplicationRole.Doctor);
 
 				if (name != null)
 				{
-					//users.Where(x => x.Name == name);
+					users = users.Where(x => x.Name.Contains(name));
 				}
 				if (city != null)
 				{
-					users.Where(x => x.City.Contains(city));
+					users = users.Where(x => x.City.Contains(city));
 				}
 				if (type != null)
 				{
-					//users.Where(x => x.Type.Contains(type));
+					users = users.Where(x => x.Type.Contains(type));
 				}
 				if (rating != null)
 				{
-					users = (
+					int[] usersIds = (
 						from u in users
 						join ur in _context.Ratings
 							on u.Id equals ur.UserId
-						where ur.Value >= rating
-						select u);
+						group ur by ur.UserId into grp
+						where grp.Average(x => x.Value) > rating
+						select new
+						{
+							UserId = grp.Key,
+							Rating = grp.Average(x => x.Value)
+						})
+						.Select(x => x.UserId)
+						.ToArray();
+
+					users = users.Where(x => usersIds.Contains(x.Id));
 				}
 
 				return await users.Select(x => ConvertUser(x)).ToArrayAsync(cancellationToken);
