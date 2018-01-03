@@ -39,6 +39,10 @@ namespace ARSFD.Database
 
 				b.Property(x => x.City);
 
+				b.Property(x => x.Name);
+
+				b.Property(x => x.Type);
+
 				b.HasKey(x => x.Id);
 
 				b.ToTable("Users");

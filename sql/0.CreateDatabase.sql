@@ -15,6 +15,8 @@ CREATE TABLE [dbo].[Users]
 	[NormalizedUserName] [nvarchar](256) NOT NULL,
 	[Role] INT NOT NULL,
 	[City] [nvarchar](256) NULL,
+	[Name] [nvarchar](256) NULL,
+	[Type] [nvarchar](256) NULL,
 CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC

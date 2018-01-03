@@ -61,6 +61,8 @@ namespace ARSFD.Services.Impl
 					UserName = user.UserName,
 					NormalizedUserName = user.NormalizedUserName,
 					Role = role,
+					Name = user.Name,
+					Type = user.Type,
 				};
 
 				await _context.Users.AddAsync(app, cancellationToken);
@@ -94,6 +96,8 @@ namespace ARSFD.Services.Impl
 					UserName = user.UserName,
 					NormalizedUserName = user.NormalizedUserName,
 					Role = role,
+					Name = user.Name,
+					Type = user.Type,
 				};
 
 				return app;
@@ -126,6 +130,8 @@ namespace ARSFD.Services.Impl
 					UserName = user.UserName,
 					NormalizedUserName = user.NormalizedUserName,
 					Role = role,
+					Name = user.Name,
+					Type = user.Type,
 				};
 
 				return app;
@@ -158,6 +164,8 @@ namespace ARSFD.Services.Impl
 					UserName = user.UserName,
 					NormalizedUserName = user.NormalizedUserName,
 					Role = role,
+					Name = user.Name,
+					Type = user.Type,
 				};
 
 				return app;

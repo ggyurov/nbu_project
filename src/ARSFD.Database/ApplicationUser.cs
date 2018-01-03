@@ -20,6 +20,12 @@ namespace ARSFD.Database
 		[MaxLength(256)]
 		public string City { get; set; }
 
+		[MaxLength(256)]
+		public string Name { get; set; }
+
+		[MaxLength(256)]
+		public string Type { get; set; }
+
 		public bool EmailConfirmed { get; set; }
 
 		public ApplicationRole Role { get; set; }
