@@ -21,7 +21,7 @@ namespace ARSFD.Services
 			string normalizedNserName,
 			CancellationToken cancellationToken = default);
 
-		Task<ApplicationUser> Find(
+		Task<ApplicationUser[]> Find(
 			string name,
 			string city,
 			string type,

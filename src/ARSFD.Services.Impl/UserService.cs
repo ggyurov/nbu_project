@@ -183,11 +183,11 @@ namespace ARSFD.Services.Impl
 			{
 				IQueryable<DATABASE.ApplicationUser> users = _context.Users;
 
-				if(name != null)
+				if (name != null)
 				{
 					//users.Where(x => x.Name == name);
 				}
-				if(city != null)
+				if (city != null)
 				{
 					users.Where(x => x.City.Contains(city));
 				}
@@ -201,11 +201,11 @@ namespace ARSFD.Services.Impl
 						from u in users
 						join ur in _context.Ratings
 							on u.Id equals ur.UserId
-						//where ur.Value >= rating
+						where ur.Value >= rating
 						select u);
 				}
 
-				return await users.ToArrayAsync();
+				return await users.Select(x => ConvertUser(x)).ToArrayAsync(cancellationToken);
 			}
 			catch (Exception ex)
 			{
@@ -214,6 +214,27 @@ namespace ARSFD.Services.Impl
 		}
 
 		#endregion
+
+		private static ApplicationUser ConvertUser(DATABASE.ApplicationUser value)
+		{
+			ApplicationRole role = ConvertRole(value.Role);
+
+			var user = new ApplicationUser
+			{
+				Id = value.Id,
+				City = value.City,
+				Email = value.Email,
+				EmailConfirmed = value.EmailConfirmed,
+				PasswordHash = value.PasswordHash,
+				UserName = value.UserName,
+				NormalizedUserName = value.NormalizedUserName,
+				Role = role,
+				Name = value.Name,
+				Type = value.Type,
+			};
+
+			return user;
+		}
 
 		private static DATABASE.ApplicationRole ConvertRole(ApplicationRole value)
 		{
