@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using ARSFD.Services;
@@ -6,7 +8,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace ARSFD.Web.Services
 {
-	public class ApplicationUserStore: IUserStore<ApplicationUser>, IUserPasswordStore<ApplicationUser>, IRoleStore<ApplicationRole>
+	public class ApplicationUserStore: IUserStore<ApplicationUser>, IUserPasswordStore<ApplicationUser>, IUserClaimStore<ApplicationUser>
 	{
 		private readonly IUserService _userService;
 
@@ -111,62 +113,37 @@ namespace ARSFD.Web.Services
 
 		#endregion
 
-		#region IRoleStore<ApplicationRole> members
+		#region IUserClaimStore<ApplicationUser> members
 
-		public Task<IdentityResult> CreateAsync(ApplicationRole role, CancellationToken cancellationToken)
+		public Task<IList<Claim>> GetClaimsAsync(ApplicationUser user, CancellationToken cancellationToken)
+		{
+			string roleName = Enum.GetName(typeof(ARSFD.Services.ApplicationRole), user.Role);
+
+			var claims = new List<Claim>();
+			var claim = new Claim(ApplicationRole.ClaimType, roleName);
+			claims.Add(claim);
+
+			return Task.FromResult<IList<Claim>>(claims);
+		}
+
+		public Task AddClaimsAsync(ApplicationUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<IdentityResult> UpdateAsync(ApplicationRole role, CancellationToken cancellationToken)
+		public Task ReplaceClaimAsync(ApplicationUser user, Claim claim, Claim newClaim, CancellationToken cancellationToken)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<IdentityResult> DeleteAsync(ApplicationRole role, CancellationToken cancellationToken)
+		public Task RemoveClaimsAsync(ApplicationUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<string> GetRoleIdAsync(ApplicationRole role, CancellationToken cancellationToken)
-			=> Task.FromResult(role.Value.ToString());
-
-		public Task<string> GetRoleNameAsync(ApplicationRole role, CancellationToken cancellationToken)
-			=> Task.FromResult(Enum.GetName(typeof(ARSFD.Services.ApplicationRole), role.Value));
-
-		public Task SetRoleNameAsync(ApplicationRole role, string roleName, CancellationToken cancellationToken)
-			=> Task.CompletedTask;
-
-		public Task<string> GetNormalizedRoleNameAsync(ApplicationRole role, CancellationToken cancellationToken)
-			=> Task.FromResult(Enum.GetName(typeof(ARSFD.Services.ApplicationRole), role.Value));
-
-		public Task SetNormalizedRoleNameAsync(ApplicationRole role, string normalizedName, CancellationToken cancellationToken)
-			=> Task.CompletedTask;
-
-		Task<ApplicationRole> IRoleStore<ApplicationRole>.FindByIdAsync(string roleId, CancellationToken cancellationToken)
+		public Task<IList<ApplicationUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken)
 		{
-			ARSFD.Services.ApplicationRole value = Enum
-				.Parse<ARSFD.Services.ApplicationRole>(roleId);
-
-			var role = new ApplicationRole
-			{
-				Value = value,
-			};
-
-			return Task.FromResult(role);
-		}
-
-		Task<ApplicationRole> IRoleStore<ApplicationRole>.FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken)
-		{
-			ARSFD.Services.ApplicationRole value = Enum
-				.Parse<ARSFD.Services.ApplicationRole>(normalizedRoleName);
-
-			var role = new ApplicationRole
-			{
-				Value = value,
-			};
-
-			return Task.FromResult(role);
+			throw new NotImplementedException();
 		}
 
 		#endregion

@@ -1,4 +1,5 @@
-﻿using ARSFD.Services.Impl;
+﻿using System;
+using ARSFD.Services.Impl;
 using ARSFD.Web.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,12 +32,31 @@ namespace ARSFD.Web
 			services
 				.AddIdentity<SERVICES.ApplicationUser, ApplicationRole>()
 				.AddUserStore<ApplicationUserStore>()
-				.AddRoleStore<ApplicationUserStore>()
+				.AddRoleStore<ApplicationRoleStore>()
 				.AddDefaultTokenProviders();
 
 			services
 				.AddScoped<SERVICES.IAppointmentService, AppointmentService>()
 				.AddScoped<SERVICES.IUserService, UserService>();
+
+			services.AddAuthentication();
+
+			services.AddAuthorization(options =>
+			{
+				options.AddPolicy(nameof(SERVICES.ApplicationRole.Doctor), config =>
+				{
+					string roleName = Enum.GetName(typeof(SERVICES.ApplicationRole), SERVICES.ApplicationRole.Doctor);
+
+					config.RequireClaim(ApplicationRole.ClaimType, roleName);
+				});
+
+				options.AddPolicy(nameof(SERVICES.ApplicationRole.Patient), config =>
+				{
+					string roleName = Enum.GetName(typeof(SERVICES.ApplicationRole), SERVICES.ApplicationRole.Patient);
+
+					config.RequireClaim(ApplicationRole.ClaimType, roleName);
+				});
+			});
 
 			services.AddMvc();
 		}
