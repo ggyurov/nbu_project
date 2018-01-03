@@ -20,5 +20,12 @@ namespace ARSFD.Services
 		Task<ApplicationUser> GetNormalized(
 			string normalizedNserName,
 			CancellationToken cancellationToken = default);
+
+		Task<ApplicationUser> Find(
+			string name,
+			string city,
+			string type,
+			double? rating,
+			CancellationToken cancellationToken = default);
 	}
 }
