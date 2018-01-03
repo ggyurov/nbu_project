@@ -15,6 +15,8 @@ CREATE TABLE [dbo].[Users]
 	[NormalizedUserName] [nvarchar](256) NOT NULL,
 	[Role] INT NOT NULL,
 	[City] [nvarchar](256) NULL,
+	[Name] [nvarchar](256) NULL,
+	[Type] [nvarchar](256) NULL,
 CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
@@ -60,7 +62,7 @@ CREATE TABLE [dbo].[Ratings]
 	[Id] INT IDENTITY(1,1) NOT NULL,
 	[UserId] INT NOT NULL,
 	[ByUserId] INT NOT NULL,
-	[Value] BIT NOT NULL,
+	[Value] INT NOT NULL,
 CONSTRAINT [PK_Ratings] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC

@@ -8,6 +8,6 @@
 
 		public int ByUserId { get; set; }
 
-		public bool Value { get; set; }
+		public int Value { get; set; }
 	}
 }
