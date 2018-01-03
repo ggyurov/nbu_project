@@ -85,7 +85,7 @@ namespace ARSFD.Services.Impl
 					.Users
 					.FirstAsync(x => x.Id == id, cancellationToken);
 
-				ApplicationRole role = ConvertRole(user.Role);
+				RoleType role = ConvertRole(user.Role);
 
 				var app = new ApplicationUser
 				{
@@ -119,7 +119,7 @@ namespace ARSFD.Services.Impl
 					.Users
 					.FirstAsync(x => x.UserName == userName, cancellationToken);
 
-				ApplicationRole role = ConvertRole(user.Role);
+				RoleType role = ConvertRole(user.Role);
 
 				var app = new ApplicationUser
 				{
@@ -153,7 +153,7 @@ namespace ARSFD.Services.Impl
 					.Users
 					.FirstAsync(x => x.NormalizedUserName == normalizedUserName, cancellationToken);
 
-				ApplicationRole role = ConvertRole(user.Role);
+				RoleType role = ConvertRole(user.Role);
 
 				var app = new ApplicationUser
 				{
@@ -217,7 +217,7 @@ namespace ARSFD.Services.Impl
 
 		private static ApplicationUser ConvertUser(DATABASE.ApplicationUser value)
 		{
-			ApplicationRole role = ConvertRole(value.Role);
+			RoleType role = ConvertRole(value.Role);
 
 			var user = new ApplicationUser
 			{
@@ -236,31 +236,31 @@ namespace ARSFD.Services.Impl
 			return user;
 		}
 
-		private static DATABASE.ApplicationRole ConvertRole(ApplicationRole value)
+		private static DATABASE.ApplicationRole ConvertRole(RoleType value)
 		{
 			switch (value)
 			{
-				case ApplicationRole.None:
+				case RoleType.None:
 					return DATABASE.ApplicationRole.None;
-				case ApplicationRole.Patient:
+				case RoleType.Patient:
 					return DATABASE.ApplicationRole.Patient;
-				case ApplicationRole.Doctor:
+				case RoleType.Doctor:
 					return DATABASE.ApplicationRole.Doctor;
 				default:
 					throw new ArgumentException($"Invalid application role `{value}`");
 			}
 		}
 
-		private static ApplicationRole ConvertRole(DATABASE.ApplicationRole value)
+		private static RoleType ConvertRole(DATABASE.ApplicationRole value)
 		{
 			switch (value)
 			{
 				case DATABASE.ApplicationRole.None:
-					return ApplicationRole.None;
+					return RoleType.None;
 				case DATABASE.ApplicationRole.Patient:
-					return ApplicationRole.Patient;
+					return RoleType.Patient;
 				case DATABASE.ApplicationRole.Doctor:
-					return ApplicationRole.Doctor;
+					return RoleType.Doctor;
 				default:
 					throw new ArgumentException($"Invalid application role `{value}`");
 			}

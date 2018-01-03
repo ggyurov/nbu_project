@@ -6,7 +6,7 @@ namespace ARSFD.Services
 	/// Enumeration of application user roles.
 	/// </summary>
 	[Flags]
-	public enum ApplicationRole: int
+	public enum RoleType: int
 	{
 		/// <summary>
 		/// Flag indicating user has no role.

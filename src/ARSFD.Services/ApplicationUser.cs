@@ -28,6 +28,6 @@ namespace ARSFD.Services
 
 		public bool EmailConfirmed { get; set; }
 
-		public ApplicationRole Role { get; set; }
+		public RoleType Role { get; set; }
 	}
 }

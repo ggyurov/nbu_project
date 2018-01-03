@@ -4,9 +4,11 @@ using ARSFD.Web.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Serialization;
 using DATABASE = ARSFD.Database;
 using SERVICES = ARSFD.Services;
 
@@ -43,22 +45,25 @@ namespace ARSFD.Web
 
 			services.AddAuthorization(options =>
 			{
-				options.AddPolicy(nameof(SERVICES.ApplicationRole.Doctor), config =>
+				options.AddPolicy(nameof(SERVICES.RoleType.Doctor), config =>
 				{
-					string roleName = Enum.GetName(typeof(SERVICES.ApplicationRole), SERVICES.ApplicationRole.Doctor);
+					string roleName = Enum.GetName(typeof(SERVICES.RoleType), SERVICES.RoleType.Doctor);
 
 					config.RequireClaim(ApplicationRole.ClaimType, roleName);
 				});
 
-				options.AddPolicy(nameof(SERVICES.ApplicationRole.Patient), config =>
+				options.AddPolicy(nameof(SERVICES.RoleType.Patient), config =>
 				{
-					string roleName = Enum.GetName(typeof(SERVICES.ApplicationRole), SERVICES.ApplicationRole.Patient);
+					string roleName = Enum.GetName(typeof(SERVICES.RoleType), SERVICES.RoleType.Patient);
 
 					config.RequireClaim(ApplicationRole.ClaimType, roleName);
 				});
 			});
 
-			services.AddMvc();
+			services.AddMvc()
+				.AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver())
+				.AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+				.AddDataAnnotationsLocalization();
 		}
 
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)

@@ -117,7 +117,7 @@ namespace ARSFD.Web.Services
 
 		public Task<IList<Claim>> GetClaimsAsync(ApplicationUser user, CancellationToken cancellationToken)
 		{
-			string roleName = Enum.GetName(typeof(ARSFD.Services.ApplicationRole), user.Role);
+			string roleName = Enum.GetName(typeof(ARSFD.Services.RoleType), user.Role);
 
 			var claims = new List<Claim>();
 			var claim = new Claim(ApplicationRole.ClaimType, roleName);

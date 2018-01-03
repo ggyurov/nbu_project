@@ -1,4 +1,5 @@
-﻿@model RegisterViewModel
+﻿@using ARSFD.Services
+@model RegisterViewModel
 @{
 	ViewData["Title"] = "Register";
 }
@@ -8,9 +9,34 @@
 <div class="row">
 	<div class="col-md-4">
 		<form asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
-			<h4>Create a new account.</h4>
 			<hr />
 			<div asp-validation-summary="All" class="text-danger"></div>
+			<div class="form-group">
+				<input asp-for="Role" value="@RoleType.Patient" style="display: none;" />
+				<label asp-for="Role"></label>
+				<br />
+				<div id="roleGroup" class="btn-group" role="group" aria-label="...">
+					<button type="button" class="btn btn-default active" data-value="@RoleType.Patient">@nameof(RoleType.Patient)</button>
+					<button type="button" class="btn btn-default" data-value="@RoleType.Doctor">@nameof(RoleType.Doctor)</button>
+				</div>
+			</div>
+			<div class="form-group">
+				<label asp-for="Name"></label>
+				<input asp-for="Name" class="form-control" />
+				<span asp-validation-for="Name" class="text-danger"></span>
+			</div>
+			<div id="doctorSection" style="display: none;">
+				<div class="form-group">
+					<label asp-for="Type"></label>
+					<input asp-for="Type" class="form-control" />
+					<span asp-validation-for="Type" class="text-danger"></span>
+				</div>
+				<div class="form-group">
+					<label asp-for="City"></label>
+					<input asp-for="City" class="form-control" />
+					<span asp-validation-for="City" class="text-danger"></span>
+				</div>
+			</div>
 			<div class="form-group">
 				<label asp-for="Email"></label>
 				<input asp-for="Email" class="form-control" />
@@ -30,6 +56,24 @@
 		</form>
 	</div>
 </div>
+<script>
+	$(function () {
+		var roleButtons = $("#roleGroup > button");
+		var doctorSection = $("#doctorSection");
+
+		roleButtons.on("click", function () {
+			var roleButton = $(this);
+
+			var value = roleButton.data("value");
+			$("#Role").val(value);
+
+			roleButtons.removeClass("active");
+			roleButton.addClass("active");
+
+			doctorSection.toggle(value === "@RoleType.Doctor");
+		});
+	});
+</script>
 
 @section Scripts {
 	@await Html.PartialAsync("_ValidationScriptsPartial")

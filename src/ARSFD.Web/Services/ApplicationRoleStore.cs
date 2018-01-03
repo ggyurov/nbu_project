@@ -38,21 +38,21 @@ namespace ARSFD.Web.Services
 			=> Task.FromResult(role.Value.ToString());
 
 		public Task<string> GetRoleNameAsync(ApplicationRole role, CancellationToken cancellationToken)
-			=> Task.FromResult(Enum.GetName(typeof(ARSFD.Services.ApplicationRole), role.Value));
+			=> Task.FromResult(Enum.GetName(typeof(ARSFD.Services.RoleType), role.Value));
 
 		public Task SetRoleNameAsync(ApplicationRole role, string roleName, CancellationToken cancellationToken)
 			=> Task.CompletedTask;
 
 		public Task<string> GetNormalizedRoleNameAsync(ApplicationRole role, CancellationToken cancellationToken)
-			=> Task.FromResult(Enum.GetName(typeof(ARSFD.Services.ApplicationRole), role.Value));
+			=> Task.FromResult(Enum.GetName(typeof(ARSFD.Services.RoleType), role.Value));
 
 		public Task SetNormalizedRoleNameAsync(ApplicationRole role, string normalizedName, CancellationToken cancellationToken)
 			=> Task.CompletedTask;
 
 		public Task<ApplicationRole> FindByIdAsync(string roleId, CancellationToken cancellationToken)
 		{
-			ARSFD.Services.ApplicationRole value = Enum
-				.Parse<ARSFD.Services.ApplicationRole>(roleId);
+			ARSFD.Services.RoleType value = Enum
+				.Parse<ARSFD.Services.RoleType>(roleId);
 
 			var role = new ApplicationRole
 			{
@@ -64,8 +64,8 @@ namespace ARSFD.Web.Services
 
 		public Task<ApplicationRole> FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken)
 		{
-			ARSFD.Services.ApplicationRole value = Enum
-				.Parse<ARSFD.Services.ApplicationRole>(normalizedRoleName);
+			ARSFD.Services.RoleType value = Enum
+				.Parse<ARSFD.Services.RoleType>(normalizedRoleName);
 
 			var role = new ApplicationRole
 			{
@@ -86,7 +86,7 @@ namespace ARSFD.Web.Services
 
 		public Task<IList<Claim>> GetClaimsAsync(ApplicationRole role, CancellationToken cancellationToken = default)
 		{
-			string roleName = Enum.GetName(typeof(ARSFD.Services.ApplicationRole), role.Value);
+			string roleName = Enum.GetName(typeof(ARSFD.Services.RoleType), role.Value);
 
 			var claims = new List<Claim>();
 			var claim = new Claim(ApplicationRole.ClaimType, roleName);

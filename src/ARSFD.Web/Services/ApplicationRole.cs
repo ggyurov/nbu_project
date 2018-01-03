@@ -6,6 +6,6 @@ namespace ARSFD.Web.Services
 	{
 		public const string ClaimType = "RoleClaim";
 
-		public SERVICES.ApplicationRole Value { get; set; }
+		public SERVICES.RoleType Value { get; set; }
 	}
 }

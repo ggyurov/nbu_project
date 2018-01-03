@@ -1,9 +1,26 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ARSFD.Services;
 
 namespace ARSFD.Web.Models.AccountViewModels
 {
 	public class RegisterViewModel
 	{
+		[Required]
+		[Display(Name = "Are you a doctor or a patient?")]
+		public RoleType Role { get; set; }
+
+		[Required]
+		[Display(Name = "City")]
+		public string City { get; set; }
+
+		[Required]
+		[Display(Name = "Name")]
+		public string Name { get; set; }
+
+		[Required]
+		[Display(Name = "Type")]
+		public string Type { get; set; }
+
 		[Required]
 		[EmailAddress]
 		[Display(Name = "Email")]
