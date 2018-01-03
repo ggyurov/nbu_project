@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ARSFD.Database
+namespace ARSFD.Services
 {
 	/// <summary>
 	/// Enumeration of application user roles.

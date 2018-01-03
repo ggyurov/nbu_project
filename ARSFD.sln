@@ -30,8 +30,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sql", "sql", "{032D3338-2A6A-444E-BC73-51F3C2152BA8}"
 	ProjectSection(SolutionItems) = preProject
 		sql\0.CreateDatabase.sql = sql\0.CreateDatabase.sql
-		sql\1.CreateTables.sql = sql\1.CreateTables.sql
-		sql\2.AddCityToUsersTable.sql = sql\2.AddCityToUsersTable.sql
 	EndProjectSection
 EndProject
 Global

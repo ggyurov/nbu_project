@@ -6,13 +6,13 @@ namespace ARSFD.Services
 	{
 		public int Id { get; set; }
 
-		public string UserId { get; set; }
+		public int UserId { get; set; }
 
 		public DateTime Date { get; set; }
 
-		public string DoctorId { get; set; }
+		public int DoctorId { get; set; }
 
-		public string CanceledById { get; set; }
+		public int? CanceledById { get; set; }
 
 		public DateTime? CanceledOn { get; set; }
 

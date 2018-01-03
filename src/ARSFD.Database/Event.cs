@@ -13,8 +13,7 @@ namespace ARSFD.Database
 		[MaxLength(256)]
 		public string Text { get; set; }
 
-		[MaxLength(450)]
-		public string UserId { get; set; }
+		public int UserId { get; set; }
 
 		public DateTime StartDate { get; set; }
 

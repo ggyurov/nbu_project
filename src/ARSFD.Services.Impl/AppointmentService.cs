@@ -92,16 +92,6 @@ namespace ARSFD.Services.Impl
 					throw new ArgumentException("Invalid appointment date.");
 				}
 
-				if (appointment.UserId == null)
-				{
-					throw new ArgumentException("Invalid appointment user identifier.");
-				}
-
-				if (appointment.DoctorId == null)
-				{
-					throw new ArgumentException("Invalid appointment doctor identifier.");
-				}
-
 				#endregion
 
 				var app = new DATABASE.Appointment

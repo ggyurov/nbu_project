@@ -4,134 +4,18 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE TABLE [dbo].[RoleClaims]
-(
-	[Id] [int] IDENTITY(1,1) NOT NULL,
-	[ClaimType] [nvarchar](max) NULL,
-	[ClaimValue] [nvarchar](max) NULL,
-	[RoleId] [nvarchar](450) NOT NULL,
-CONSTRAINT [PK_RoleClaims] PRIMARY KEY CLUSTERED 
-(
-	[Id] ASC
-)
-	WITH
-	(
-		PAD_INDEX = OFF,
-		STATISTICS_NORECOMPUTE = OFF,
-		IGNORE_DUP_KEY = OFF,
-		ALLOW_ROW_LOCKS = ON,
-		ALLOW_PAGE_LOCKS = ON
-	) ON [PRIMARY]
-)
-ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
-GO
-
-CREATE TABLE [dbo].[Roles]
-(
-	[Id] [nvarchar](450) NOT NULL,
-	[ConcurrencyStamp] [nvarchar](max) NULL,
-	[Name] [nvarchar](256) NULL,
-	[NormalizedName] [nvarchar](256) NULL,
-CONSTRAINT [PK_Roles] PRIMARY KEY CLUSTERED 
-(
-	[Id] ASC
-)
-	WITH
-	(
-		PAD_INDEX = OFF,
-		STATISTICS_NORECOMPUTE = OFF,
-		IGNORE_DUP_KEY = OFF,
-		ALLOW_ROW_LOCKS = ON,
-		ALLOW_PAGE_LOCKS = ON
-	) ON [PRIMARY]
-)
-ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
-GO
-
-CREATE TABLE [dbo].[UserClaims]
-(
-	[Id] [int] IDENTITY(1,1) NOT NULL,
-	[ClaimType] [nvarchar](max) NULL,
-	[ClaimValue] [nvarchar](max) NULL,
-	[UserId] [nvarchar](450) NOT NULL,
-CONSTRAINT [PK_UserClaims] PRIMARY KEY CLUSTERED 
-(
-	[Id] ASC
-)
-	WITH
-	(
-		PAD_INDEX = OFF,
-		STATISTICS_NORECOMPUTE = OFF,
-		IGNORE_DUP_KEY = OFF,
-		ALLOW_ROW_LOCKS = ON,
-		ALLOW_PAGE_LOCKS = ON
-	) ON [PRIMARY]
-)
-ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
-GO
-
-CREATE TABLE [dbo].[UserLogins]
-(
-	[LoginProvider] [nvarchar](450) NOT NULL,
-	[ProviderKey] [nvarchar](450) NOT NULL,
-	[ProviderDisplayName] [nvarchar](max) NULL,
-	[UserId] [nvarchar](450) NOT NULL,
-CONSTRAINT [PK_UserLogins] PRIMARY KEY CLUSTERED 
-(
-	[LoginProvider] ASC,
-	[ProviderKey] ASC
-)
-	WITH
-	(
-		PAD_INDEX = OFF,
-		STATISTICS_NORECOMPUTE = OFF,
-		IGNORE_DUP_KEY = OFF,
-		ALLOW_ROW_LOCKS = ON,
-		ALLOW_PAGE_LOCKS = ON
-	) ON [PRIMARY]
-)
-ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
-GO
-
-CREATE TABLE [dbo].[UserRoles]
-(
-	[UserId] [nvarchar](450) NOT NULL,
-	[RoleId] [nvarchar](450) NOT NULL,
-CONSTRAINT [PK_UserRoles] PRIMARY KEY CLUSTERED 
-(
-	[UserId] ASC,
-	[RoleId] ASC
-)
-	WITH
-	(
-		PAD_INDEX = OFF,
-		STATISTICS_NORECOMPUTE = OFF,
-		IGNORE_DUP_KEY = OFF,
-		ALLOW_ROW_LOCKS = ON,
-		ALLOW_PAGE_LOCKS = ON
-	) ON [PRIMARY]
-)
-ON [PRIMARY]
-GO
-
+-- USERS table
 CREATE TABLE [dbo].[Users]
 (
-	[Id] [nvarchar](450) NOT NULL,
-	[AccessFailedCount] [int] NOT NULL,
-	[ConcurrencyStamp] [nvarchar](max) NULL,
-	[Email] [nvarchar](256) NULL,
+	[Id] INT IDENTITY(1,1) NOT NULL,
+	[Email] [nvarchar](256) NOT NULL,
 	[EmailConfirmed] [bit] NOT NULL,
-	[LockoutEnabled] [bit] NOT NULL,
-	[LockoutEnd] [datetimeoffset](7) NULL,
-	[NormalizedEmail] [nvarchar](256) NULL,
-	[NormalizedUserName] [nvarchar](256) NULL,
-	[PasswordHash] [nvarchar](max) NULL,
-	[PhoneNumber] [nvarchar](max) NULL,
-	[PhoneNumberConfirmed] [bit] NOT NULL,
-	[SecurityStamp] [nvarchar](max) NULL,
-	[TwoFactorEnabled] [bit] NOT NULL,
-	[UserName] [nvarchar](256) NULL,
-CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED 
+	[PasswordHash] [nvarchar](max) NOT NULL,
+	[UserName] [nvarchar](256) NOT NULL,
+	[NormalizedUserName] [nvarchar](256) NOT NULL,
+	[Role] INT NOT NULL,
+	[City] [nvarchar](256) NULL,
+CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )
@@ -144,20 +28,20 @@ CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED
 		ALLOW_PAGE_LOCKS = ON
 	) ON [PRIMARY]
 )
-ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 
-CREATE TABLE [dbo].[UserTokens]
+-- APPOINTMENTS table
+CREATE TABLE [dbo].[Appointments]
 (
-	[UserId] [nvarchar](450) NOT NULL,
-	[LoginProvider] [nvarchar](450) NOT NULL,
-	[Name] [nvarchar](450) NOT NULL,
-	[Value] [nvarchar](max) NULL,
-CONSTRAINT [PK_UserTokens] PRIMARY KEY CLUSTERED 
+	[Id] INT IDENTITY(1,1) NOT NULL,
+	[UserId] INT NOT NULL,
+	[Date] DATETIME NOT NULL,
+	[DoctorId] INT NOT NULL,
+	[CanceledById] INT NULL,
+	[CanceledOn] DATETIME NULL,
+CONSTRAINT [PK_Appointments] PRIMARY KEY CLUSTERED 
 (
-	[UserId] ASC,
-	[LoginProvider] ASC,
-	[Name] ASC
+	[Id] ASC
 )
 	WITH
 	(
@@ -168,55 +52,155 @@ CONSTRAINT [PK_UserTokens] PRIMARY KEY CLUSTERED
 		ALLOW_PAGE_LOCKS = ON
 	) ON [PRIMARY]
 )
-ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 
-ALTER TABLE [dbo].[RoleClaims] WITH CHECK
-ADD CONSTRAINT [FK_RoleClaims_Roles_RoleId] FOREIGN KEY ([RoleId])
-REFERENCES [dbo].[Roles] ([Id])
-ON DELETE CASCADE
+-- RATINGS table
+CREATE TABLE [dbo].[Ratings]
+(
+	[Id] INT IDENTITY(1,1) NOT NULL,
+	[UserId] INT NOT NULL,
+	[ByUserId] INT NOT NULL,
+	[Value] BIT NOT NULL,
+CONSTRAINT [PK_Ratings] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)
+	WITH
+	(
+		PAD_INDEX = OFF,
+		STATISTICS_NORECOMPUTE = OFF,
+		IGNORE_DUP_KEY = OFF,
+		ALLOW_ROW_LOCKS = ON,
+		ALLOW_PAGE_LOCKS = ON
+	) ON [PRIMARY]
+)
 GO
 
-ALTER TABLE [dbo].[RoleClaims]
-CHECK CONSTRAINT [FK_RoleClaims_Roles_RoleId]
+-- COMMENTS table
+CREATE TABLE [dbo].[Comments]
+(
+	[Id] INT IDENTITY(1,1) NOT NULL,
+	[Text] NVARCHAR(256) NOT NULL,
+	[ByUserId] INT NOT NULL,
+	[UserId] INT NULL,
+	[EventId] INT NULL,
+CONSTRAINT [PK_Comments] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)
+	WITH
+	(
+		PAD_INDEX = OFF,
+		STATISTICS_NORECOMPUTE = OFF,
+		IGNORE_DUP_KEY = OFF,
+		ALLOW_ROW_LOCKS = ON,
+		ALLOW_PAGE_LOCKS = ON
+	) ON [PRIMARY]
+)
 GO
 
-ALTER TABLE [dbo].[UserClaims] WITH CHECK
-ADD CONSTRAINT [FK_UserClaims_Users_UserId] FOREIGN KEY ([UserId])
+-- EVENTS table
+CREATE TABLE [dbo].[Events]
+(
+	[Id] INT IDENTITY(1,1) NOT NULL,
+	[UserId] INT NOT NULL,
+	[Title] NVARCHAR(128) NOT NULL,
+	[Text] NVARCHAR(256) NOT NULL,
+	[StartDate] DATETIME NOT NULL,
+	[EndDate] DATETIME NOT NULL,
+CONSTRAINT [PK_Events] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)
+	WITH
+	(
+		PAD_INDEX = OFF,
+		STATISTICS_NORECOMPUTE = OFF,
+		IGNORE_DUP_KEY = OFF,
+		ALLOW_ROW_LOCKS = ON,
+		ALLOW_PAGE_LOCKS = ON
+	) ON [PRIMARY]
+)
+GO
+
+-- Foreign keys
+ALTER TABLE [dbo].[Appointments] WITH CHECK
+ADD CONSTRAINT [FK_Appointments_Users_UserId] FOREIGN KEY ([UserId])
 REFERENCES [dbo].[Users] ([Id])
-ON DELETE CASCADE
 GO
 
-ALTER TABLE [dbo].[UserClaims]
-CHECK CONSTRAINT [FK_UserClaims_Users_UserId]
+ALTER TABLE [dbo].[Appointments]
+CHECK CONSTRAINT [FK_Appointments_Users_UserId]
 GO
 
-ALTER TABLE [dbo].[UserLogins] WITH CHECK
-ADD CONSTRAINT [FK_UserLogins_Users_UserId] FOREIGN KEY ([UserId])
+ALTER TABLE [dbo].[Appointments] WITH CHECK
+ADD CONSTRAINT [FK_Appointments_Users_DoctorId] FOREIGN KEY ([DoctorId])
 REFERENCES [dbo].[Users] ([Id])
-ON DELETE CASCADE
 GO
 
-ALTER TABLE [dbo].[UserLogins]
-CHECK CONSTRAINT [FK_UserLogins_Users_UserId]
+ALTER TABLE [dbo].[Appointments]
+CHECK CONSTRAINT [FK_Appointments_Users_DoctorId]
 GO
 
-ALTER TABLE [dbo].[UserRoles] WITH CHECK
-ADD CONSTRAINT [FK_UserRoles_Roles_RoleId] FOREIGN KEY ([RoleId])
-REFERENCES [dbo].[Roles] ([Id])
-ON DELETE CASCADE
-GO
-
-ALTER TABLE [dbo].[UserRoles]
-CHECK CONSTRAINT [FK_UserRoles_Roles_RoleId]
-GO
-
-ALTER TABLE [dbo].[UserRoles] WITH CHECK
-ADD CONSTRAINT [FK_UserRoles_Users_UserId] FOREIGN KEY ([UserId])
+ALTER TABLE [dbo].[Appointments] WITH CHECK
+ADD CONSTRAINT [FK_Appointments_Users_CanceledById] FOREIGN KEY ([CanceledById])
 REFERENCES [dbo].[Users] ([Id])
-ON DELETE CASCADE
 GO
 
-ALTER TABLE [dbo].[UserRoles]
-CHECK CONSTRAINT [FK_UserRoles_Users_UserId]
+ALTER TABLE [dbo].[Appointments]
+CHECK CONSTRAINT [FK_Appointments_Users_CanceledById]
+GO
+
+ALTER TABLE [dbo].[Ratings] WITH CHECK
+ADD CONSTRAINT [FK_Ratings_Users_UserId] FOREIGN KEY ([UserId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+
+ALTER TABLE [dbo].[Ratings]
+CHECK CONSTRAINT [FK_Ratings_Users_UserId]
+GO
+
+ALTER TABLE [dbo].[Ratings] WITH CHECK
+ADD CONSTRAINT [FK_Ratings_Users_ByUserId] FOREIGN KEY ([ByUserId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+
+ALTER TABLE [dbo].[Ratings]
+CHECK CONSTRAINT [FK_Ratings_Users_ByUserId]
+GO
+
+ALTER TABLE [dbo].[Comments] WITH CHECK
+ADD CONSTRAINT [FK_Comments_Users_UserId] FOREIGN KEY ([UserId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+
+ALTER TABLE [dbo].[Comments]
+CHECK CONSTRAINT [FK_Comments_Users_UserId]
+GO
+
+ALTER TABLE [dbo].[Comments] WITH CHECK
+ADD CONSTRAINT [FK_Comments_Users_ByUserId] FOREIGN KEY ([ByUserId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+
+ALTER TABLE [dbo].[Comments]
+CHECK CONSTRAINT [FK_Comments_Users_ByUserId]
+GO
+
+ALTER TABLE [dbo].[Comments] WITH CHECK
+ADD CONSTRAINT [FK_Comments_Events_EventId] FOREIGN KEY ([EventId])
+REFERENCES [dbo].[Events] ([Id])
+GO
+
+ALTER TABLE [dbo].[Comments]
+CHECK CONSTRAINT [FK_Comments_Events_EventId]
+GO
+
+ALTER TABLE [dbo].[Events] WITH CHECK
+ADD CONSTRAINT [FK_Events_Users_UserId] FOREIGN KEY ([UserId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+
+ALTER TABLE [dbo].[Events]
+CHECK CONSTRAINT [FK_Events_Users_UserId]
 GO

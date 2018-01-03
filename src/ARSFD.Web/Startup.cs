@@ -22,16 +22,21 @@ namespace ARSFD.Web
 
 		public void ConfigureServices(IServiceCollection services)
 		{
-			services.AddDbContext<DATABASE.ApplicationDbContext>(options =>
-				options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+			services
+				.AddDbContext<DATABASE.ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-			services.AddIdentity<DATABASE.ApplicationUser, DATABASE.ApplicationRole>()
-				.AddEntityFrameworkStores<DATABASE.ApplicationDbContext>()
+			services
+				.AddTransient<IEmailSender, EmailSender>();
+
+			services
+				.AddIdentity<SERVICES.ApplicationUser, ApplicationRole>()
+				.AddUserStore<ApplicationUserStore>()
+				.AddRoleStore<ApplicationUserStore>()
 				.AddDefaultTokenProviders();
 
-			services.AddTransient<IEmailSender, EmailSender>();
-
-			services.AddScoped<SERVICES.IAppointmentService, AppointmentService>();
+			services
+				.AddScoped<SERVICES.IAppointmentService, AppointmentService>()
+				.AddScoped<SERVICES.IUserService, UserService>();
 
 			services.AddMvc();
 		}

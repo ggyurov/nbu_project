@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
-using ARSFD.Database;
+using ARSFD.Services;
 using ARSFD.Web.Models.ManageViewModels;
 using ARSFD.Web.Services;
 using Microsoft.AspNetCore.Authentication;
@@ -56,7 +56,7 @@ namespace ARSFD.Web.Controllers
 			{
 				Username = user.UserName,
 				Email = user.Email,
-				PhoneNumber = user.PhoneNumber,
+				PhoneNumber = null,
 				IsEmailConfirmed = user.EmailConfirmed,
 				StatusMessage = StatusMessage
 			};
@@ -89,15 +89,15 @@ namespace ARSFD.Web.Controllers
 				}
 			}
 
-			var phoneNumber = user.PhoneNumber;
-			if (model.PhoneNumber != phoneNumber)
-			{
-				var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
-				if (!setPhoneResult.Succeeded)
-				{
-					throw new ApplicationException($"Unexpected error occurred setting phone number for user with ID '{user.Id}'.");
-				}
-			}
+			//var phoneNumber = user.PhoneNumber;
+			//if (model.PhoneNumber != phoneNumber)
+			//{
+			//	var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, model.PhoneNumber);
+			//	if (!setPhoneResult.Succeeded)
+			//	{
+			//		throw new ApplicationException($"Unexpected error occurred setting phone number for user with ID '{user.Id}'.");
+			//	}
+			//}
 
 			StatusMessage = "Your profile has been updated";
 			return RedirectToAction(nameof(Index));
@@ -258,26 +258,27 @@ namespace ARSFD.Web.Controllers
 		[HttpGet]
 		public async Task<IActionResult> LinkLoginCallback()
 		{
-			var user = await _userManager.GetUserAsync(User);
-			if (user == null)
-			{
-				throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-			}
+			await Task.CompletedTask;
+			//var user = await _userManager.GetUserAsync(User);
+			//if (user == null)
+			//{
+			//	throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+			//}
 
-			var info = await _signInManager.GetExternalLoginInfoAsync(user.Id);
-			if (info == null)
-			{
-				throw new ApplicationException($"Unexpected error occurred loading external login info for user with ID '{user.Id}'.");
-			}
+			//var info = await _signInManager.GetExternalLoginInfoAsync(user.Id);
+			//if (info == null)
+			//{
+			//	throw new ApplicationException($"Unexpected error occurred loading external login info for user with ID '{user.Id}'.");
+			//}
 
-			var result = await _userManager.AddLoginAsync(user, info);
-			if (!result.Succeeded)
-			{
-				throw new ApplicationException($"Unexpected error occurred adding external login for user with ID '{user.Id}'.");
-			}
+			//var result = await _userManager.AddLoginAsync(user, info);
+			//if (!result.Succeeded)
+			//{
+			//	throw new ApplicationException($"Unexpected error occurred adding external login for user with ID '{user.Id}'.");
+			//}
 
-			// Clear the existing external cookie to ensure a clean login process
-			await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+			//// Clear the existing external cookie to ensure a clean login process
+			//await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
 			StatusMessage = "The external login was added.";
 			return RedirectToAction(nameof(ExternalLogins));
@@ -316,7 +317,7 @@ namespace ARSFD.Web.Controllers
 			var model = new TwoFactorAuthenticationViewModel
 			{
 				HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null,
-				Is2faEnabled = user.TwoFactorEnabled,
+				//Is2faEnabled = user.TwoFactorEnabled,
 				RecoveryCodesLeft = await _userManager.CountRecoveryCodesAsync(user),
 			};
 
@@ -332,10 +333,10 @@ namespace ARSFD.Web.Controllers
 				throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
 			}
 
-			if (!user.TwoFactorEnabled)
-			{
-				throw new ApplicationException($"Unexpected error occured disabling 2FA for user with ID '{user.Id}'.");
-			}
+			//if (!user.TwoFactorEnabled)
+			//{
+			//	throw new ApplicationException($"Unexpected error occured disabling 2FA for user with ID '{user.Id}'.");
+			//}
 
 			return View(nameof(Disable2fa));
 		}
@@ -447,11 +448,6 @@ namespace ARSFD.Web.Controllers
 			if (user == null)
 			{
 				throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-			}
-
-			if (!user.TwoFactorEnabled)
-			{
-				throw new ApplicationException($"Cannot generate recovery codes for user with ID '{user.Id}' as they do not have 2FA enabled.");
 			}
 
 			var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);

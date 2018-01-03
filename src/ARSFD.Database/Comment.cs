@@ -9,11 +9,9 @@ namespace ARSFD.Database
 		[MaxLength(256)]
 		public string Text { get; set; }
 
-		[MaxLength(450)]
-		public string UserId { get; set; }
+		public int? UserId { get; set; }
 
-		[MaxLength(450)]
-		public string ByUserId { get; set; }
+		public int ByUserId { get; set; }
 
 		public int? EventId { get; set; }
 	}
