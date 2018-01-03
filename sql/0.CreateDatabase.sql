@@ -62,7 +62,7 @@ CREATE TABLE [dbo].[Ratings]
 	[Id] INT IDENTITY(1,1) NOT NULL,
 	[UserId] INT NOT NULL,
 	[ByUserId] INT NOT NULL,
-	[Value] BIT NOT NULL,
+	[Value] INT NOT NULL,
 CONSTRAINT [PK_Ratings] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
