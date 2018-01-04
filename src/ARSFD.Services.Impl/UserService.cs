@@ -85,9 +85,11 @@ namespace ARSFD.Services.Impl
 					.Users
 					.FirstAsync(x => x.Id == id, cancellationToken);
 
+				double rating = _context.Ratings.Where(x => x.UserId == id).Select(x => x.Value).Average();
+
 				RoleType role = ConvertRole(user.Role);
 
-				var app = new ApplicationUser
+				var applicationUser = new ApplicationUser
 				{
 					Id = user.Id,
 					City = user.City,
@@ -99,9 +101,10 @@ namespace ARSFD.Services.Impl
 					Role = role,
 					Name = user.Name,
 					Type = user.Type,
+					Rating = rating
 				};
 
-				return app;
+				return applicationUser;
 			}
 			catch (Exception ex)
 			{

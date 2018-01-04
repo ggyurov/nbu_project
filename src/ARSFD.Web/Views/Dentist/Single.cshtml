@@ -1,5 +1,17 @@
-﻿
+﻿@using ARSFD.Web.Models.DentistViewModels
+@using ARSFD.Web.Models.CommentViewModels
+@model DentistViewModel
 @{
-	ViewData["Title"] = "Single";
+	ViewData["Title"] = Model.Name;
 }
-<h2>Single</h2>
+
+<h2>@Model.Name</h2>
+
+<p>Специалност: @Model.Type</p>
+<p>Град: @Model.City</p>
+
+<h2>Мнения</h2>
+@foreach (CommentViewModel comment in Model.Comments)
+{
+	<p>@comment.Text - @comment.ByUserName</p>
+}

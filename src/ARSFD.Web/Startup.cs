@@ -39,6 +39,7 @@ namespace ARSFD.Web
 
 			services
 				.AddScoped<SERVICES.IAppointmentService, AppointmentService>()
+				.AddScoped<SERVICES.ICommentService, CommentService>()
 				.AddScoped<SERVICES.IUserService, UserService>();
 
 			services.AddAuthentication();
