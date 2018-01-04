@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@using ARSFD.Services;
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+<!DOCTYPE html>
 <html>
 <head>
 	<meta charset="utf-8" />
@@ -50,9 +55,23 @@
 			</div>
 			<div class="navbar-collapse collapse">
 				<ul class="nav navbar-nav">
-					<li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-					<li><a asp-area="" asp-controller="Home" asp-action="About">About</a></li>
-					<li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+					@{
+						if (SignInManager.IsSignedIn(User))
+						{
+							ApplicationUser user = await UserManager.GetUserAsync(User);
+
+							if (user.Role == RoleType.Doctor)
+							{
+								<li><a asp-area="" asp-controller="Appointment" asp-action="Index">Appointments</a></li>
+								<li><a asp-area="" asp-controller="User" asp-action="Patients">Patients</a></li>
+							}
+							else if (user.Role == RoleType.Patient)
+							{
+								<li><a asp-area="" asp-controller="Dentist" asp-action="Index">Dentists</a></li>
+								<li><a asp-area="" asp-controller="Appointment" asp-action="Index">Appointments</a></li>
+							}
+						}
+					}
 				</ul>
 				@await Html.PartialAsync("_LoginPartial")
 			</div>
