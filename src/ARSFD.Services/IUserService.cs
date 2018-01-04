@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ARSFD.Services
@@ -31,6 +33,11 @@ namespace ARSFD.Services
 		Task<ApplicationUser[]> FindPatients(
 			string name,
 			double? rating,
+			CancellationToken cancellationToken = default);
+
+		Task<IDictionary<DayOfWeek, WorkingHour[]>> FindWorkingHours(
+			int userId,
+			DayOfWeek[] days = null,
 			CancellationToken cancellationToken = default);
 	}
 }

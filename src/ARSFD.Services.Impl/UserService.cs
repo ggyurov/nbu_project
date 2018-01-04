@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -260,7 +261,59 @@ namespace ARSFD.Services.Impl
 			}
 		}
 
+		public async Task<IDictionary<DayOfWeek, WorkingHour[]>> FindWorkingHours(int userId, DayOfWeek[] days = null, CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				if (days == null)
+				{
+					days = Enum
+						.GetValues(typeof(DayOfWeek))
+						.Cast<DayOfWeek>()
+						.ToArray();
+				}
+				else
+				{
+					days = days
+						.Distinct()
+						.ToArray();
+				}
+
+				IQueryable<DATABASE.WorkingHour> entities = _context
+					.WorkingHours
+					.Where(x => x.UserId == userId && days.Contains(x.DayOfWeek));
+
+				WorkingHour[] hours = await entities
+					.Select(x => ConvertWorkingHour(x))
+					.ToArrayAsync(cancellationToken);
+
+				IDictionary<DayOfWeek, WorkingHour[]> dictionary = hours
+					.GroupBy(x => x.DayOfWeek)
+					.ToDictionary(k => k.Key, v => v.ToArray());
+
+				return dictionary;
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceException($"Failed to find working hours for user `{userId}`.", ex);
+			}
+		}
+
 		#endregion
+
+		private static WorkingHour ConvertWorkingHour(DATABASE.WorkingHour value)
+		{
+			var workingHour = new WorkingHour
+			{
+				DayOfWeek = value.DayOfWeek,
+				EndTime = value.EndTime,
+				StartTime = value.StartTime,
+				UserId = value.UserId,
+				Id = value.Id,
+			};
+
+			return workingHour;
+		}
 
 		private static ApplicationUser ConvertUser(DATABASE.ApplicationUser value)
 		{
