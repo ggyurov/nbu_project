@@ -17,5 +17,7 @@ namespace ARSFD.Web.Models.DentistViewModels
 		public CommentViewModel[] Comments { get; set; }
 
 		public bool IsBlackListed { get; set; }
+
+		public bool IsRated { get; set; }
 	}
 }

@@ -26,7 +26,12 @@
 		</div>
 		<div class="row" style="margin-top: 5px;">
 			<div class="col-md-12">
-				<button type="button" class="btn btn-primary">Оцени</button>
+				<form method="post" asp-controller="Manage" asp-action="Rate">
+					<input name="id" value="@Model.Id" style="display: none;" />
+					@*TODO*@
+					<input name="value" value="3" style="display: none;" />
+					<button id="btnRate" type="submit" class="btn btn-primary">Оцени</button>
+				</form>
 			</div>
 		</div>
 		<div class="row" style="margin-top: 5px;">
@@ -42,5 +47,6 @@
 <script>
 	$(function () {
 		$("#btnBlacklist").prop("disabled", "@Model.IsBlackListed" === "True");
+		$("#btnRate").prop("disabled", "@Model.IsRated" === "True");
 	});
 </script>

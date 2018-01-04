@@ -18,16 +18,19 @@ namespace ARSFD.Web.Controllers
 	{
 		private readonly IUserService _userService;
 		private readonly ICommentService _commentService;
+		private readonly IRatingService _ratingService;
 		private readonly UserManager<ApplicationUser> _userManager;
 
 		public DentistController(
 			IUserService userService,
 			ICommentService commentService,
+			IRatingService ratingService,
 			UserManager<ApplicationUser> userManager)
 		{
-			_userService = userService;
-			_commentService = commentService;
-			_userManager = userManager;
+			_userService = userService ?? throw new ArgumentNullException(nameof(userService));
+			_commentService = commentService ?? throw new ArgumentNullException(nameof(commentService));
+			_ratingService = ratingService ?? throw new ArgumentNullException(nameof(ratingService));
+			_userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
 		}
 
 		[HttpGet]
@@ -82,6 +85,9 @@ namespace ARSFD.Web.Controllers
 				BlackList[] blackLists = await _userService.GetUserBlackLists(id, cancellationToken);
 				bool isBlackListed = blackLists.Any(x => x.ByUserId == user.Id);
 
+				Rating[] ratings = await _ratingService.Get(id, cancellationToken);
+				bool isRated = ratings.Any(x => x.ByUserId == user.Id);
+
 				CommentViewModel[] commentsModel = comments.Select(x => new CommentViewModel
 				{
 					ByUserId = x.ByUserId,
@@ -101,6 +107,7 @@ namespace ARSFD.Web.Controllers
 					Type = dentist.Type,
 					Comments = commentsModel,
 					IsBlackListed = isBlackListed,
+					IsRated = isRated,
 				};
 
 				return View(model);
