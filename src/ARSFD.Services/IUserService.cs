@@ -39,5 +39,9 @@ namespace ARSFD.Services
 			int userId,
 			DayOfWeek[] days = null,
 			CancellationToken cancellationToken = default);
+
+		Task AddWorkingHour(
+			WorkingHour workingHour,
+			CancellationToken cancellationToken = default);
 	}
 }

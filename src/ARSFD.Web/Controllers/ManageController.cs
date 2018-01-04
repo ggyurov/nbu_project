@@ -205,6 +205,41 @@ namespace ARSFD.Web.Controllers
 			return View(model);
 		}
 
+		[HttpPost]
+		public async Task<IActionResult> AddWorkingHour(
+			[FromForm(Name = "dayOfWeek")] DayOfWeek dayOfWeek,
+			[FromForm(Name = "startTime")] DateTime startTime,
+			[FromForm(Name = "endTime")] DateTime endTime,
+			CancellationToken cancellationToken = default)
+		{
+			if (endTime.TimeOfDay < startTime.TimeOfDay
+				|| startTime.TimeOfDay == endTime.TimeOfDay)
+			{
+				// TODO: add error
+				return RedirectToAction(nameof(WorkingHours));
+			}
+
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null)
+			{
+				throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+			}
+
+			var defaultDate = new DateTime(2001, 1, 1);
+
+			var workingHour = new WorkingHour
+			{
+				UserId = user.Id,
+				DayOfWeek = dayOfWeek,
+				StartTime = defaultDate.Add(startTime.TimeOfDay),
+				EndTime = defaultDate.Add(endTime.TimeOfDay),
+			};
+
+			await _userService.AddWorkingHour(workingHour, cancellationToken);
+
+			return RedirectToAction(nameof(WorkingHours));
+		}
+
 		[HttpGet]
 		public async Task<IActionResult> SetPassword()
 		{

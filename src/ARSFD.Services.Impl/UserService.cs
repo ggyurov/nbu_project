@@ -299,6 +299,30 @@ namespace ARSFD.Services.Impl
 			}
 		}
 
+		public async Task AddWorkingHour(
+			WorkingHour workingHour,
+			CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				// TODO: validation
+				var value = new DATABASE.WorkingHour
+				{
+					DayOfWeek = workingHour.DayOfWeek,
+					UserId = workingHour.UserId,
+					StartTime = workingHour.StartTime,
+					EndTime = workingHour.EndTime,
+				};
+
+				_context.WorkingHours.Add(value);
+				await _context.SaveChangesAsync(cancellationToken);
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceException($"Failed to add working hour for user `{workingHour.UserId}`.", ex);
+			}
+		}
+
 		#endregion
 
 		private static WorkingHour ConvertWorkingHour(DATABASE.WorkingHour value)
