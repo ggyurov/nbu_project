@@ -86,7 +86,10 @@ namespace ARSFD.Services.Impl
 					.Users
 					.FirstAsync(x => x.Id == id, cancellationToken);
 
-				double rating = _context.Ratings.Where(x => x.UserId == id).Select(x => x.Value).Average();
+				//double rating = _context.Ratings
+				//	.Where(x => x.UserId == id)
+				//	.Select(x => x.Value)
+				//	.Average();
 
 				RoleType role = ConvertRole(user.Role);
 
@@ -102,7 +105,7 @@ namespace ARSFD.Services.Impl
 					Role = role,
 					Name = user.Name,
 					Type = user.Type,
-					Rating = rating
+					//Rating = rating
 				};
 
 				return applicationUser;
@@ -323,6 +326,25 @@ namespace ARSFD.Services.Impl
 			catch (Exception ex)
 			{
 				throw new ServiceException($"Failed to add working hour for user `{workingHour.UserId}`.", ex);
+			}
+		}
+
+		public async Task RemoveWorkingHour(
+			int id,
+			CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				DATABASE.WorkingHour entity = await _context.WorkingHours
+					.FirstAsync(x => x.Id == id, cancellationToken);
+
+				_context.WorkingHours.Remove(entity);
+
+				await _context.SaveChangesAsync(cancellationToken);
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceException($"Failed to remove working hour `{id}`.", ex);
 			}
 		}
 

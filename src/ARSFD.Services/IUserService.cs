@@ -43,5 +43,9 @@ namespace ARSFD.Services
 		Task AddWorkingHour(
 			WorkingHour workingHour,
 			CancellationToken cancellationToken = default);
+
+		Task RemoveWorkingHour(
+			int id,
+			CancellationToken cancellationToken = default);
 	}
 }

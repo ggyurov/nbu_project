@@ -190,6 +190,7 @@ namespace ARSFD.Web.Controllers
 				.ThenBy(x => x.StartTime)
 				.Select(x => new WorkingHourListItemViewModel
 				{
+					Id = x.Id,
 					DayOfWeek = x.DayOfWeek,
 					StartTime = x.StartTime,
 					EndTime = x.EndTime,
@@ -236,6 +237,16 @@ namespace ARSFD.Web.Controllers
 			};
 
 			await _userService.AddWorkingHour(workingHour, cancellationToken);
+
+			return RedirectToAction(nameof(WorkingHours));
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> RemoveWorkingHour(
+			[FromForm(Name = "id")] int id,
+			CancellationToken cancellationToken = default)
+		{
+			await _userService.RemoveWorkingHour(id, cancellationToken);
 
 			return RedirectToAction(nameof(WorkingHours));
 		}
