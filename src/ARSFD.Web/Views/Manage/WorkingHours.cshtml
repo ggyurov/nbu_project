@@ -1,0 +1,89 @@
+﻿@using System.Globalization
+
+@model WorkingHoursViewModel
+@{
+	ViewData["Title"] = "Работно време";
+	ViewData.AddActivePage(ManageNavPages.WorkingHours);
+}
+
+<h4>@ViewData["Title"]</h4>
+@Html.Partial("_StatusMessage", Model.StatusMessage)
+<div class="row">
+	<div class="col-md-12">
+		<table class="table table-bordered table-striped table-hover">
+			<caption>
+				<button id="addButton" type="button" class="btn btn-primary">@Localizer["Добави"]</button>
+			</caption>
+			<thead>
+				<tr>
+					<th>Ден</th>
+					<th>Начало</th>
+					<th>Край</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (WorkingHourListItemViewModel viewModel in Model.WorkingHours)
+				{
+					<tr>
+						<td>@DateTimeFormatInfo.CurrentInfo.GetDayName(viewModel.DayOfWeek)</td>
+						<td>@viewModel.StartTime.ToShortTimeString()</td>
+						<td>@viewModel.EndTime.ToShortTimeString()</td>
+					</tr>
+				}
+
+				@if (Model.WorkingHours.Length <= 0)
+				{
+					<tr>
+						<td colspan="3">
+							Няма добавено работно време.
+						</td>
+					</tr>
+
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+<div id="addDialog" title="Добавяне на работно време" style="display: none;">
+	<form method="post" asp-controller="Manage" asp-action="AddWorkingHour">
+		<div asp-validation-summary="All" class="text-danger"></div>
+		<div class="form-group">
+			<label asp-for="Add.DayOfWeek"></label>
+			<select name="dayOfWeek" class="form-control">
+				<option value="Monady" selected>понеделник</option>
+				<option value="Tuesday">вторник</option>
+				<option value="Wednesday">сряда</option>
+				<option value="Thursday">четвъртък</option>
+				<option value="Friday">петък</option>
+				<option value="Saturday">събота</option>
+				<option value="Sunday">неделя</option>
+			</select>
+			<span asp-validation-for="Add.DayOfWeek" class="text-danger"></span>
+		</div>
+		<div class="form-group">
+			<label asp-for="Add.StartTime"></label>
+			<input type="text" name="startTime" class="form-control" placeholder="00:00" />
+			<span asp-validation-for="Add.StartTime" class="text-danger"></span>
+		</div>
+		<div class="form-group">
+			<label asp-for="Add.EndTime"></label>
+			<input type="text" name="endTime" class="form-control" placeholder="00:00" />
+			<span asp-validation-for="Add.EndTime" class="text-danger"></span>
+		</div>
+		<button type="submit" class="btn btn-default">Добави</button>
+	</form>
+</div>
+<script>
+	$(function () {
+		$("#addButton").on("click", function () {
+			$("#addDialog").dialog({
+				width: 400,
+				modal: true
+			});
+		});
+	});
+</script>
+
+@section Scripts {
+	@await Html.PartialAsync("_ValidationScriptsPartial")
+}

@@ -14,6 +14,8 @@ namespace ARSFD.Database
 
 		public DbSet<ApplicationUser> Users { get; set; }
 
+		public DbSet<WorkingHour> WorkingHours { get; set; }
+
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
 			: base(options)
 		{
@@ -116,6 +118,23 @@ namespace ARSFD.Database
 				b.HasKey(x => x.Id);
 
 				b.ToTable("Events");
+			});
+
+			modelBuilder.Entity<WorkingHour>(b =>
+			{
+				b.Property(x => x.Id);
+
+				b.Property(x => x.UserId);
+
+				b.Property(x => x.DayOfWeek);
+
+				b.Property(x => x.StartTime);
+
+				b.Property(x => x.EndTime);
+
+				b.HasKey(x => x.Id);
+
+				b.ToTable("WorkingHours");
 			});
 		}
 	}
