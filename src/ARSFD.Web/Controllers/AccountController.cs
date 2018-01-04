@@ -17,19 +17,22 @@ namespace ARSFD.Web.Controllers
 	{
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly SignInManager<ApplicationUser> _signInManager;
+		private readonly IUserService _userService;
 		private readonly IEmailSender _emailSender;
 		private readonly ILogger _logger;
 
 		public AccountController(
 			UserManager<ApplicationUser> userManager,
 			SignInManager<ApplicationUser> signInManager,
+			IUserService userService,
 			IEmailSender emailSender,
 			ILogger<AccountController> logger)
 		{
-			_userManager = userManager;
-			_signInManager = signInManager;
-			_emailSender = emailSender;
-			_logger = logger;
+			_userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+			_signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
+			_userService = userService ?? throw new ArgumentNullException(nameof(userService));
+			_emailSender = emailSender ?? throw new ArgumentNullException(nameof(emailSender));
+			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
 		}
 
 		[TempData]
@@ -127,6 +130,9 @@ namespace ARSFD.Web.Controllers
 				if (result.Succeeded)
 				{
 					_logger.LogInformation("User created a new account with password.");
+
+					// Refresh user to get the ID
+					user = await _userManager.FindByNameAsync(user.UserName);
 
 					var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 					var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
