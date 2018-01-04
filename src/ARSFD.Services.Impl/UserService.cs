@@ -86,10 +86,14 @@ namespace ARSFD.Services.Impl
 					.Users
 					.FirstAsync(x => x.Id == id, cancellationToken);
 
-				//double rating = _context.Ratings
-				//	.Where(x => x.UserId == id)
-				//	.Select(x => x.Value)
-				//	.Average();
+				int[] votes = _context.Ratings
+					.Where(x => x.UserId == id)
+					.Select(x => x.Value)
+					.ToArray();
+
+				double rating = votes != null && votes.Length > 0
+					? votes.Average()
+					: 0;
 
 				RoleType role = ConvertRole(user.Role);
 
@@ -105,7 +109,7 @@ namespace ARSFD.Services.Impl
 					Role = role,
 					Name = user.Name,
 					Type = user.Type,
-					//Rating = rating
+					Rating = rating
 				};
 
 				return applicationUser;
