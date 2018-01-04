@@ -1,17 +1,46 @@
 ﻿@using ARSFD.Web.Models.DentistViewModels
 @using ARSFD.Web.Models.CommentViewModels
+@using ARSFD.Services
 @model DentistViewModel
 @{
 	ViewData["Title"] = Model.Name;
 }
 
-<h2>@Model.Name</h2>
+<h2>Зъболекар - @Model.Name</h2>
+<div class="row" style="margin-top: 50px;">
+	<div class="col-md-6">
+		<p>Специалност: @Model.Type</p>
+		<p>Град: @Model.City</p>
 
-<p>Специалност: @Model.Type</p>
-<p>Град: @Model.City</p>
-
-<h2>Мнения</h2>
-@foreach (CommentViewModel comment in Model.Comments)
-{
-	<p>@comment.Text - @comment.ByUserName</p>
-}
+		<h2>Мнения</h2>
+		@foreach (CommentViewModel comment in Model.Comments)
+		{
+			<p>@comment.Text - @comment.ByUserName</p>
+		}
+	</div>
+	<div class="col-md-6">
+		<div class="row">
+			<div class="col-md-12">
+				<button type="button" class="btn btn-primary">Запиши час</button>
+			</div>
+		</div>
+		<div class="row" style="margin-top: 5px;">
+			<div class="col-md-12">
+				<button type="button" class="btn btn-primary">Оцени</button>
+			</div>
+		</div>
+		<div class="row" style="margin-top: 5px;">
+			<div class="col-md-12">
+				<form method="post" asp-controller="Manage" asp-action="AddToBlackList">
+					<input name="id" value="@Model.Id" style="display: none;" />
+					<button id="btnBlacklist" type="submit" class="btn btn-primary">Включи в черен списък</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	$(function () {
+		$("#btnBlacklist").prop("disabled", "@Model.IsBlackListed" === "True");
+	});
+</script>

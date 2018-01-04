@@ -6,23 +6,28 @@ using ARSFD.Services;
 using ARSFD.Web.Extensions;
 using ARSFD.Web.Models.CommentViewModels;
 using ARSFD.Web.Models.DentistViewModels;
-using ARSFD.Web.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ARSFD.Web.Controllers
 {
 	[Route("dentist")]
 	[Authorize(nameof(RoleType.Patient))]
-	public class DentistController : Controller
+	public class DentistController: Controller
 	{
 		private readonly IUserService _userService;
 		private readonly ICommentService _commentService;
+		private readonly UserManager<ApplicationUser> _userManager;
 
-		public DentistController(IUserService userService, ICommentService commentService)
+		public DentistController(
+			IUserService userService,
+			ICommentService commentService,
+			UserManager<ApplicationUser> userManager)
 		{
 			_userService = userService;
 			_commentService = commentService;
+			_userManager = userManager;
 		}
 
 		[HttpGet]
@@ -65,8 +70,17 @@ namespace ARSFD.Web.Controllers
 		{
 			try
 			{
+				var user = await _userManager.GetUserAsync(User);
+				if (user == null)
+				{
+					throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+				}
+
 				ApplicationUser dentist = await _userService.Get(id, cancellationToken);
 				Comment[] comments = await _commentService.GetCommentsForUser(id, cancellationToken);
+
+				BlackList[] blackLists = await _userService.GetUserBlackLists(id, cancellationToken);
+				bool isBlackListed = blackLists.Any(x => x.ByUserId == user.Id);
 
 				CommentViewModel[] commentsModel = comments.Select(x => new CommentViewModel
 				{
@@ -75,7 +89,7 @@ namespace ARSFD.Web.Controllers
 					Id = x.Id,
 					Text = x.Text,
 					UserId = x.UserId,
-					ByUserName =  _userService.Get(x.ByUserId, cancellationToken).Result.Name
+					ByUserName = _userService.Get(x.ByUserId, cancellationToken).Result.Name,
 				}).ToArray();
 
 				var model = new DentistViewModel
@@ -85,7 +99,8 @@ namespace ARSFD.Web.Controllers
 					Name = dentist.Name,
 					Rating = dentist.Rating,
 					Type = dentist.Type,
-					Comments = commentsModel
+					Comments = commentsModel,
+					IsBlackListed = isBlackListed,
 				};
 
 				return View(model);

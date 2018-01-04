@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 
 namespace ARSFD.Web.Controllers
 {
@@ -249,6 +250,23 @@ namespace ARSFD.Web.Controllers
 			await _userService.RemoveWorkingHour(id, cancellationToken);
 
 			return RedirectToAction(nameof(WorkingHours));
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> AddToBlackList(
+			[FromForm(Name = "id")] int id,
+			CancellationToken cancellationToken = default)
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null)
+			{
+				throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+			}
+
+			await _userService.AddToBlackList(id, user.Id, cancellationToken);
+
+			string referrer = Request.Headers[HeaderNames.Referer];
+			return Redirect(referrer);
 		}
 
 		[HttpGet]
