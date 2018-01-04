@@ -85,7 +85,7 @@ namespace ARSFD.Services.Impl
 					.Users
 					.FirstAsync(x => x.Id == id, cancellationToken);
 
-				double rating = _context.Ratings.Where(x => x.UserId == id).Select(x => x.Value).Average();
+				double rating = _context.Ratings.Where(x => x.UserId == id).Select(x => x.Value).DefaultIfEmpty(0).Average();
 
 				RoleType role = ConvertRole(user.Role);
 
