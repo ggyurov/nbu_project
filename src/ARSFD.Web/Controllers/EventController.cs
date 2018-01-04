@@ -5,12 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ARSFD.Web.Controllers
 {
-	[Route("calendar")]
-	public class CalendarController: Controller
+	[Route("event")]
+	public class EventController: Controller
 	{
 		private readonly IUserService _userService;
 
-		public CalendarController(IUserService userService)
+		public EventController(IUserService userService)
 		{
 			_userService = userService;
 		}
