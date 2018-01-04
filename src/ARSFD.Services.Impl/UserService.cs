@@ -352,6 +352,102 @@ namespace ARSFD.Services.Impl
 			}
 		}
 
+		public async Task AddToBlackList(
+			int userId,
+			int byUserId,
+			CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				bool blacklisted = await _context.BlackLists
+					.AnyAsync(x => x.UserId == userId && x.ByUserId == byUserId, cancellationToken);
+
+				if (blacklisted)
+				{
+					throw new Exception("Already blacklisted.");
+				}
+
+				var item = new DATABASE.BlackList
+				{
+					UserId = userId,
+					ByUserId = byUserId,
+				};
+
+				await _context.BlackLists.AddAsync(item, cancellationToken);
+				await _context.SaveChangesAsync(cancellationToken);
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceException($"Failed to add to blacklist.", ex);
+			}
+		}
+
+		public async Task RemoveFromBlackList(
+			int userId,
+			int byUserId,
+			CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				DATABASE.BlackList item = await _context.BlackLists
+					.FirstAsync(x => x.UserId == userId && x.ByUserId == byUserId, cancellationToken);
+
+				_context.BlackLists.Remove(item);
+
+				await _context.SaveChangesAsync(cancellationToken);
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceException($"Failed to remove to blacklist.", ex);
+			}
+		}
+
+		public async Task<BlackList[]> GetUserBlackLists(
+			int id,
+			CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				DATABASE.BlackList[] items = await _context.BlackLists
+					.Where(x => x.UserId == id)
+					.ToArrayAsync(cancellationToken);
+
+				return items.Select(x => new BlackList
+				{
+					Id = x.Id,
+					ByUserId = x.ByUserId,
+					UserId = x.UserId,
+				}).ToArray();
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceException($"Failed to get to blacklists.", ex);
+			}
+		}
+
+		public async Task<BlackList[]> GetByUserBlackLists(
+			int id,
+			CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				DATABASE.BlackList[] items = await _context.BlackLists
+					.Where(x => x.ByUserId == id)
+					.ToArrayAsync(cancellationToken);
+
+				return items.Select(x => new BlackList
+				{
+					Id = x.Id,
+					ByUserId = x.ByUserId,
+					UserId = x.UserId,
+				}).ToArray();
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceException($"Failed to get to blacklists.", ex);
+			}
+		}
+
 		#endregion
 
 		private static WorkingHour ConvertWorkingHour(DATABASE.WorkingHour value)

@@ -16,6 +16,8 @@ namespace ARSFD.Database
 
 		public DbSet<WorkingHour> WorkingHours { get; set; }
 
+		public DbSet<BlackList> BlackLists { get; set; }
+
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
 			: base(options)
 		{
@@ -135,6 +137,19 @@ namespace ARSFD.Database
 				b.HasKey(x => x.Id);
 
 				b.ToTable("WorkingHours");
+			});
+
+			modelBuilder.Entity<BlackList>(b =>
+			{
+				b.Property(x => x.Id);
+
+				b.Property(x => x.UserId);
+
+				b.Property(x => x.ByUserId);
+
+				b.HasKey(x => x.Id);
+
+				b.ToTable("BlackList");
 			});
 		}
 	}

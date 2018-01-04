@@ -147,6 +147,28 @@ CONSTRAINT [PK_WorkingHours] PRIMARY KEY CLUSTERED
 	) ON [PRIMARY]
 )
 GO
+
+-- Blacklist table
+CREATE TABLE [dbo].[BlackList]
+(
+	[Id] INT IDENTITY(1,1) NOT NULL,
+	[UserId] INT NOT NULL,
+	[ByUserId] INT NOT NULL,
+CONSTRAINT [PK_BlackList] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)
+	WITH
+	(
+		PAD_INDEX = OFF,
+		STATISTICS_NORECOMPUTE = OFF,
+		IGNORE_DUP_KEY = OFF,
+		ALLOW_ROW_LOCKS = ON,
+		ALLOW_PAGE_LOCKS = ON
+	) ON [PRIMARY]
+)
+GO
+
 -- Foreign keys
 ALTER TABLE [dbo].[Appointments] WITH CHECK
 ADD CONSTRAINT [FK_Appointments_Users_UserId] FOREIGN KEY ([UserId])
@@ -236,4 +258,22 @@ GO
 
 ALTER TABLE [dbo].[WorkingHours]
 CHECK CONSTRAINT [FK_WorkingHours_Users_UserId]
+GO
+
+ALTER TABLE [dbo].[BlackList] WITH CHECK
+ADD CONSTRAINT [FK_BlackList_Users_UserId] FOREIGN KEY ([UserId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+
+ALTER TABLE [dbo].[BlackList]
+CHECK CONSTRAINT [FK_BlackList_Users_UserId]
+GO
+
+ALTER TABLE [dbo].[BlackList] WITH CHECK
+ADD CONSTRAINT [FK_BlackList_Users_ByUserId] FOREIGN KEY ([ByUserId])
+REFERENCES [dbo].[Users] ([Id])
+GO
+
+ALTER TABLE [dbo].[BlackList]
+CHECK CONSTRAINT [FK_BlackList_Users_ByUserId]
 GO
