@@ -1,17 +1,22 @@
 ﻿@using ARSFD.Services
 @using ARSFD.Web.Views.Manage
+
 @inject SignInManager<ApplicationUser> SignInManager
-@{
-	var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
-}
+@inject UserManager<ApplicationUser> UserManager
 
 <ul class="nav nav-pills nav-stacked">
-	<li class="@ManageNavPages.IndexNavClass(ViewContext)"><a asp-action="Index">Profile</a></li>
-	<li class="@ManageNavPages.ChangePasswordNavClass(ViewContext)"><a asp-action="ChangePassword">Password</a></li>
-	@if (hasExternalLogins)
-	{
-		<li class="@ManageNavPages.ExternalLoginsNavClass(ViewContext)"><a asp-action="ExternalLogins">External logins</a></li>
+	<li class="@ManageNavPages.IndexNavClass(ViewContext)"><a asp-action="Index">@Localizer["Профил"]</a></li>
+	<li class="@ManageNavPages.ChangePasswordNavClass(ViewContext)"><a asp-action="ChangePassword">@Localizer["Парола"]</a></li>
+	@{
+		if (SignInManager.IsSignedIn(User))
+		{
+			ApplicationUser user = await UserManager.GetUserAsync(User);
+
+			if (user.Role == RoleType.Doctor)
+			{
+				<li class="@ManageNavPages.WorkingHoursNavClass(ViewContext)"><a asp-action="WorkingHours">@Localizer["Работно време"]</a></li>
+			}
+		}
 	}
-	<li class="@ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)"><a asp-action="TwoFactorAuthentication">Two-factor authentication</a></li>
 </ul>
 

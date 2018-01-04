@@ -1,0 +1,40 @@
+﻿@using System.Globalization
+
+@model WorkingHoursViewModel
+@{
+	ViewData["Title"] = "Работно време";
+	ViewData.AddActivePage(ManageNavPages.WorkingHours);
+}
+
+<h4>@ViewData["Title"]</h4>
+@Html.Partial("_StatusMessage", Model.StatusMessage)
+<div class="row">
+	<div class="col-md-12">
+		<table class="table table-bordered table-striped table-hover">
+			<caption>
+				<button type="button" class="btn btn-primary">@Localizer["Добави"]</button>
+			</caption>
+			<thead>
+				<tr>
+					<th>Ден</th>
+					<th>Начало</th>
+					<th>Край</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (WorkingHourListItemViewModel viewModel in Model.WorkingHours)
+				{
+					<tr>
+						<td>@DateTimeFormatInfo.CurrentInfo.GetDayName(viewModel.DayOfWeek)</td>
+						<td>@viewModel.StartTime.ToShortTimeString()</td>
+						<td>@viewModel.EndTime.ToShortTimeString()</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+@section Scripts {
+	@await Html.PartialAsync("_ValidationScriptsPartial")
+}
