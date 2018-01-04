@@ -65,13 +65,13 @@
 
 							if (user.Role == RoleType.Doctor)
 							{
-								<li><a asp-area="" asp-controller="Appointment" asp-action="Index">Appointments</a></li>
-								<li><a asp-area="" asp-controller="User" asp-action="Patients">Patients</a></li>
+								<li><a asp-area="" asp-controller="Patient" asp-action="Index">@Localizer["Пациенти"]</a></li>
+								<li><a asp-area="" asp-controller="Appointment" asp-action="Index">@Localizer["Запазени часове"]</a></li>
 							}
 							else if (user.Role == RoleType.Patient)
 							{
-								<li><a asp-area="" asp-controller="Dentist" asp-action="Index">Dentists</a></li>
-								<li><a asp-area="" asp-controller="Appointment" asp-action="Index">Appointments</a></li>
+								<li><a asp-area="" asp-controller="Dentist" asp-action="Index">@Localizer["Зъболекари"]</a></li>
+								<li><a asp-area="" asp-controller="Appointment" asp-action="Index">@Localizer["Запазени часове"]</a></li>
 							}
 						}
 					}

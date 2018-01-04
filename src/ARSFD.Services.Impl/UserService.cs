@@ -7,7 +7,7 @@ using DATABASE = ARSFD.Database;
 
 namespace ARSFD.Services.Impl
 {
-	public class UserService : IUserService
+	public class UserService: IUserService
 	{
 		private DATABASE.ApplicationDbContext _context;
 
@@ -218,7 +218,45 @@ namespace ARSFD.Services.Impl
 			}
 			catch (Exception ex)
 			{
-				throw new ServiceException($"Failed to get users", ex);
+				throw new ServiceException($"Failed to get doctors", ex);
+			}
+		}
+
+		public async Task<ApplicationUser[]> FindPatients(string name, double? rating, CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				IQueryable<DATABASE.ApplicationUser> users = _context.Users.Where(x => x.Role == DATABASE.ApplicationRole.Patient);
+
+				if (name != null)
+				{
+					users = users.Where(x => x.Name.Contains(name));
+				}
+
+				if (rating != null)
+				{
+					int[] usersIds = (
+						from u in users
+						join ur in _context.Ratings
+							on u.Id equals ur.UserId
+						group ur by ur.UserId into grp
+						where grp.Average(x => x.Value) > rating
+						select new
+						{
+							UserId = grp.Key,
+							Rating = grp.Average(x => x.Value)
+						})
+						.Select(x => x.UserId)
+						.ToArray();
+
+					users = users.Where(x => usersIds.Contains(x.Id));
+				}
+
+				return await users.Select(x => ConvertUser(x)).ToArrayAsync(cancellationToken);
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceException($"Failed to get patients", ex);
 			}
 		}
 

@@ -27,5 +27,10 @@ namespace ARSFD.Services
 			string type,
 			double? rating,
 			CancellationToken cancellationToken = default);
+
+		Task<ApplicationUser[]> FindPatients(
+			string name,
+			double? rating,
+			CancellationToken cancellationToken = default);
 	}
 }

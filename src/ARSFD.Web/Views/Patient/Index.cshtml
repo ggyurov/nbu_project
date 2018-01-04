@@ -1,0 +1,41 @@
+﻿@using ARSFD.Web.Models.PatientViewModels
+@model PatientIndexViewModel
+@{
+	ViewData["Title"] = "Index";
+}
+
+<div class="row">
+	<h3>Търси пациенти</h3>
+	<form class="form-inline" action="@Url.Action("Index","Patient")">
+		<div class="form-group">
+			<label for="Name">Име</label>
+			<input type="text" class="form-control" name="Name" id="Name">
+		</div>
+		<div class="form-group">
+			<label for="Rating">Рейтинг</label>
+			<input type="text" class="form-control" name="Rating" id="Rating">
+		</div>
+		<button type="submit" class="btn btn-default">Търси</button>
+	</form>
+</div>
+<div class="row" style="margin-top: 20px;">
+	<table class="table table-bordered table-striped table-hover">
+		<thead>
+			<tr>
+				<th>Име</th>
+				<th>Рейтинг</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (PatientListItemViewModel patient in Model.Patients)
+			{
+				<tr>
+					<td>@patient.Name</td>
+					<td>@patient.Rating</td>
+					<td><a href="@Url.Action("Single", "Patient", new { id = patient.Id })" class="btn btn-info" role="button">Прегред</a></td>
+				</tr>
+			}
+		</tbody>
+	</table>
+</div>
