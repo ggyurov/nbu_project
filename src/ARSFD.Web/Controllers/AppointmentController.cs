@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using ARSFD.Services;
-using ARSFD.Web.Views.Appointment;
+using ARSFD.Web.Models.AppointmentViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ARSFD.Web.Controllers

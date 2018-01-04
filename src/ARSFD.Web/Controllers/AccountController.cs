@@ -76,7 +76,13 @@ namespace ARSFD.Web.Controllers
 		public IActionResult Register(string returnUrl = null)
 		{
 			ViewData["ReturnUrl"] = returnUrl;
-			return View();
+
+			var model = new RegisterViewModel
+			{
+				Role = RoleType.Patient
+			};
+
+			return View(model);
 		}
 
 		[HttpPost]
@@ -88,6 +94,24 @@ namespace ARSFD.Web.Controllers
 
 			if (ModelState.IsValid)
 			{
+				if (model.Role == RoleType.Doctor)
+				{
+					if (string.IsNullOrEmpty(model.Type))
+					{
+						ModelState.AddModelError(nameof(model.Type), "Полето `Специалност` е задължително.");
+					}
+
+					if (string.IsNullOrEmpty(model.City))
+					{
+						ModelState.AddModelError(nameof(model.City), "Полето `Населено място` е задължително.");
+					}
+
+					if (!ModelState.IsValid)
+					{
+						return View(model);
+					}
+				}
+
 				var user = new ApplicationUser
 				{
 					UserName = model.Email,

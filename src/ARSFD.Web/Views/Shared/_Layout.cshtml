@@ -1,10 +1,13 @@
-﻿@using ARSFD.Services;
+﻿@using System.Globalization
+@using ARSFD.Services
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
-
+@{
+	string uiLanguageName = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+}
 <!DOCTYPE html>
-<html>
+<html lang="@(uiLanguageName)">
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -79,10 +82,10 @@
 	</nav>
 	<div class="container body-content">
 		@RenderBody()
-		<hr />
-		<footer>
-			<p>&copy; 2017 - ARSFD.Web</p>
-		</footer>
+		@*<hr />
+			<footer>
+				<p>&copy; 2017 - ARSFD.Web</p>
+			</footer>*@
 	</div>
 
 	@RenderSection("Scripts", required: false)

@@ -1,24 +1,21 @@
 ﻿@using ARSFD.Services
 @model RegisterViewModel
 @{
-	ViewData["Title"] = "Register";
+	ViewData["Title"] = "Регистрация на";
 }
 
 <h2>@ViewData["Title"]</h2>
-
+<div id="roleGroup" class="btn-group" role="group" aria-label="...">
+	<button type="button" class="btn btn-default" data-value="@RoleType.Patient">@Localizer["Пациент"]</button>
+	<button type="button" class="btn btn-default" data-value="@RoleType.Doctor">@Localizer["Доктор"]</button>
+</div>
 <div class="row">
 	<div class="col-md-4">
 		<form asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
 			<hr />
 			<div asp-validation-summary="All" class="text-danger"></div>
 			<div class="form-group">
-				<input asp-for="Role" value="@RoleType.Patient" style="display: none;" />
-				<label asp-for="Role"></label>
-				<br />
-				<div id="roleGroup" class="btn-group" role="group" aria-label="...">
-					<button type="button" class="btn btn-default active" data-value="@RoleType.Patient">@nameof(RoleType.Patient)</button>
-					<button type="button" class="btn btn-default" data-value="@RoleType.Doctor">@nameof(RoleType.Doctor)</button>
-				</div>
+				<input asp-for="Role" value="@Model.Role" style="display: none;" />
 			</div>
 			<div class="form-group">
 				<label asp-for="Name"></label>
@@ -52,7 +49,10 @@
 				<input asp-for="ConfirmPassword" class="form-control" />
 				<span asp-validation-for="ConfirmPassword" class="text-danger"></span>
 			</div>
-			<button type="submit" class="btn btn-default">Register</button>
+			<div class="form-group">
+				<a asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" class="btn btn-default">@Localizer["Вход"]</a>
+				<button type="submit" class="btn btn-primary">@Localizer["Регистриране"]</button>
+			</div>
 		</form>
 	</div>
 </div>
@@ -62,16 +62,24 @@
 		var doctorSection = $("#doctorSection");
 
 		roleButtons.on("click", function () {
-			var roleButton = $(this);
+			var value = $(this).data("value");
 
-			var value = roleButton.data("value");
 			$("#Role").val(value);
-
-			roleButtons.removeClass("active");
-			roleButton.addClass("active");
-
-			doctorSection.toggle(value === "@RoleType.Doctor");
+			ensureRole(value);
 		});
+
+		ensureRole("@Model.Role");
+
+		function ensureRole(value) {
+			doctorSection
+				.toggle(value === "@RoleType.Doctor");
+
+			roleButtons
+				.removeClass("active");
+
+			$("[data-value='" + value + "']")
+				.addClass("active");
+		}
 	});
 </script>
 

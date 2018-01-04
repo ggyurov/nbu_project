@@ -5,36 +5,33 @@ namespace ARSFD.Web.Models.AccountViewModels
 {
 	public class RegisterViewModel
 	{
-		[Required]
-		[Display(Name = "Are you a doctor or a patient?")]
+		[Required(ErrorMessage = "Полето `{0}` е задължително.")]
 		public RoleType Role { get; set; }
 
-		[Required]
-		[Display(Name = "City")]
-		public string City { get; set; }
-
-		[Required]
-		[Display(Name = "Name")]
+		[Required(ErrorMessage = "Полето `{0}` е задължително.")]
+		[Display(Name = "Имена")]
 		public string Name { get; set; }
 
-		[Required]
-		[Display(Name = "Type")]
+		[Display(Name = "Населено място")]
+		public string City { get; set; }
+
+		[Display(Name = "Специалност")]
 		public string Type { get; set; }
 
-		[Required]
+		[Required(ErrorMessage = "Полето `{0}` е задължително.")]
 		[EmailAddress]
-		[Display(Name = "Email")]
+		[Display(Name = "Имейл")]
 		public string Email { get; set; }
 
-		[Required]
-		[StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+		[Required(ErrorMessage = "Полето `{0}` е задължително.")]
+		[StringLength(100, ErrorMessage = "`{0}` трябва да бъде от `{1}` до `{2}` символа.", MinimumLength = 6)]
 		[DataType(DataType.Password)]
-		[Display(Name = "Password")]
+		[Display(Name = "Парола")]
 		public string Password { get; set; }
 
 		[DataType(DataType.Password)]
-		[Display(Name = "Confirm password")]
-		[Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+		[Display(Name = "Повтори парола")]
+		[Compare(nameof(Password), ErrorMessage = "Паролата не съвпада.")]
 		public string ConfirmPassword { get; set; }
 	}
 }

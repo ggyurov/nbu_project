@@ -4,15 +4,17 @@ namespace ARSFD.Web.Models.AccountViewModels
 {
 	public class LoginViewModel
 	{
-		[Required]
 		[EmailAddress]
+		[Display(Name = "Имейл")]
+		[Required(ErrorMessage = "Полето `{0}` е задължително.")]
 		public string Email { get; set; }
 
-		[Required]
 		[DataType(DataType.Password)]
+		[Display(Name = "Парола")]
+		[Required(ErrorMessage = "Полето `{0}` е задължително.")]
 		public string Password { get; set; }
 
-		[Display(Name = "Remember me?")]
+		[Display(Name = "Запомни ме?")]
 		public bool RememberMe { get; set; }
 	}
 }
