@@ -29,5 +29,7 @@ namespace ARSFD.Services
 		public bool EmailConfirmed { get; set; }
 
 		public RoleType Role { get; set; }
+
+		public double Rating { get; set; }
 	}
 }
