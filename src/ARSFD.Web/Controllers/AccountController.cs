@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using ARSFD.Services;
 using ARSFD.Web.Models.AccountViewModels;
@@ -52,13 +53,28 @@ namespace ARSFD.Web.Controllers
 		[HttpPost]
 		[AllowAnonymous]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
+		public async Task<IActionResult> Login(
+			LoginViewModel model,
+			string returnUrl = null,
+			CancellationToken cancellationToken = default)
 		{
 			ViewData["ReturnUrl"] = returnUrl;
+
 			if (ModelState.IsValid)
 			{
-				// This doesn't count login failures towards account lockout
-				// To enable password failures to trigger account lockout, set lockoutOnFailure: true
+				ApplicationUser user = await _userManager.FindByEmailAsync(model.Email);
+				if (user != null)
+				{
+					BlackList[] blacklists = await _userService.GetUserBlackLists(user.Id, cancellationToken);
+
+					// Check if user is blocked
+					if (blacklists.Length >= 4)
+					{
+						ModelState.AddModelError(string.Empty, "User is blocked.");
+						return View(model);
+					}
+				}
+
 				var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
 				if (result.Succeeded)
 				{
