@@ -19,5 +19,7 @@ namespace ARSFD.Web.Models.DentistViewModels
 		public bool IsBlackListed { get; set; }
 
 		public bool IsRated { get; set; }
+
+		public int RateValue { get; set; }
 	}
 }

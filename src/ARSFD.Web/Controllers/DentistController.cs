@@ -86,7 +86,8 @@ namespace ARSFD.Web.Controllers
 				bool isBlackListed = blackLists.Any(x => x.ByUserId == user.Id);
 
 				Rating[] ratings = await _ratingService.Get(id, cancellationToken);
-				bool isRated = ratings.Any(x => x.ByUserId == user.Id);
+				Rating rating = ratings.FirstOrDefault(x => x.ByUserId == user.Id);
+				bool isRated = rating != null;
 
 				CommentViewModel[] commentsModel = comments.Select(x => new CommentViewModel
 				{
@@ -108,6 +109,7 @@ namespace ARSFD.Web.Controllers
 					Comments = commentsModel,
 					IsBlackListed = isBlackListed,
 					IsRated = isRated,
+					RateValue = rating?.Value ?? 1,
 				};
 
 				return View(model);

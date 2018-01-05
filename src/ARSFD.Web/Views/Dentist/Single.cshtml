@@ -28,9 +28,25 @@
 			<div class="col-md-12">
 				<form method="post" asp-controller="Manage" asp-action="Rate">
 					<input name="id" value="@Model.Id" style="display: none;" />
-					@*TODO*@
-					<input name="value" value="3" style="display: none;" />
-					<button id="btnRate" type="submit" class="btn btn-primary">Оцени</button>
+					<div class="row">
+						<div class="col-md-2">
+							<button id="btnRate" type="submit" class="btn btn-primary">Оцени</button>
+						</div>
+						<div class="col-md-4">
+							<select id="selectRate" name="value" class="form-control" style="width: 70px;">
+								<option selected value="1">1</option>
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5">5</option>
+								<option value="6">6</option>
+								<option value="7">7</option>
+								<option value="8">8</option>
+								<option value="9">9</option>
+								<option value="10">10</option>
+							</select>
+						</div>
+					</div>
 				</form>
 			</div>
 		</div>
@@ -46,7 +62,14 @@
 </div>
 <script>
 	$(function () {
-		$("#btnBlacklist").prop("disabled", "@Model.IsBlackListed" === "True");
-		$("#btnRate").prop("disabled", "@Model.IsRated" === "True");
+		$("#btnBlacklist")
+			.prop("disabled", "@Model.IsBlackListed" === "True");
+
+		$("#btnRate")
+			.prop("disabled", "@Model.IsRated" === "True");
+
+		$("#selectRate")
+			.prop("disabled", "@Model.IsRated" === "True")
+			.val("@Model.RateValue");
 	});
 </script>
