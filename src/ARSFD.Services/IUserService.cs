@@ -65,5 +65,10 @@ namespace ARSFD.Services
 		Task<BlackList[]> GetByUserBlackLists(
 			int id,
 			CancellationToken cancellationToken = default);
+
+		Task UpdateNames(
+			int userId,
+			string names,
+			CancellationToken cancellationToken = default);
 	}
 }

@@ -74,27 +74,31 @@ namespace ARSFD.Web.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Index(IndexViewModel model)
+		public async Task<IActionResult> Index(IndexViewModel model, CancellationToken cancellationToken = default)
 		{
 			if (!ModelState.IsValid)
 			{
 				return View(model);
 			}
 
-			var user = await _userManager.GetUserAsync(User);
+			ApplicationUser user = await _userManager.GetUserAsync(User);
 			if (user == null)
 			{
 				throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
 			}
 
-			var email = user.Email;
-			if (model.Email != email)
+			if (model.Email != user.Email)
 			{
-				var setEmailResult = await _userManager.SetEmailAsync(user, model.Email);
+				IdentityResult setEmailResult = await _userManager.SetEmailAsync(user, model.Email);
 				if (!setEmailResult.Succeeded)
 				{
 					throw new ApplicationException($"Unexpected error occurred setting email for user with ID '{user.Id}'.");
 				}
+			}
+
+			if (model.Names != user.Name)
+			{
+				await _userService.UpdateNames(user.Id, model.Names, cancellationToken);
 			}
 
 			StatusMessage = "Your profile has been updated";

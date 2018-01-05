@@ -448,6 +448,32 @@ namespace ARSFD.Services.Impl
 			}
 		}
 
+		public async Task UpdateNames(
+			int userId,
+			string names,
+			CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				if (string.IsNullOrEmpty(names))
+				{
+					throw new ArgumentNullException(nameof(names));
+				}
+
+				DATABASE.ApplicationUser user = await _context.Users
+					.FirstAsync(x => x.Id == userId, cancellationToken);
+
+				// Update name
+				user.Name = names;
+
+				await _context.SaveChangesAsync(cancellationToken);
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceException($"Failed to update user names.", ex);
+			}
+		}
+
 		#endregion
 
 		private static WorkingHour ConvertWorkingHour(DATABASE.WorkingHour value)
