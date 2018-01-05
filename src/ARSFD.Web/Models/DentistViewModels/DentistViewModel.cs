@@ -1,4 +1,5 @@
-﻿using ARSFD.Web.Models.CommentViewModels;
+﻿using System.ComponentModel.DataAnnotations;
+using ARSFD.Web.Models.CommentViewModels;
 
 namespace ARSFD.Web.Models.DentistViewModels
 {
@@ -21,5 +22,9 @@ namespace ARSFD.Web.Models.DentistViewModels
 		public bool IsRated { get; set; }
 
 		public int RateValue { get; set; }
+
+		[Required(ErrorMessage = "Полето `{0}` е задължително.")]
+		[Display(Name = "Мнение")]
+		public string CommentText { get; set; }
 	}
 }

@@ -22,6 +22,7 @@ namespace ARSFD.Web.Controllers
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly SignInManager<ApplicationUser> _signInManager;
 		private readonly IRatingService _ratingService;
+		private readonly ICommentService _commentService;
 		private readonly IUserService _userService;
 		private readonly IEmailSender _emailSender;
 		private readonly ILogger _logger;
@@ -31,6 +32,7 @@ namespace ARSFD.Web.Controllers
 			UserManager<ApplicationUser> userManager,
 			SignInManager<ApplicationUser> signInManager,
 			IRatingService ratingService,
+			ICommentService commentService,
 			IUserService userService,
 			IEmailSender emailSender,
 			ILogger<ManageController> logger,
@@ -39,6 +41,7 @@ namespace ARSFD.Web.Controllers
 			_userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
 			_signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
 			_ratingService = ratingService ?? throw new ArgumentNullException(nameof(ratingService));
+			_commentService = commentService ?? throw new ArgumentNullException(nameof(commentService));
 			_userService = userService ?? throw new ArgumentNullException(nameof(userService));
 			_emailSender = emailSender ?? throw new ArgumentNullException(nameof(emailSender));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -285,6 +288,24 @@ namespace ARSFD.Web.Controllers
 			}
 
 			await _ratingService.SetRating(id, value, user.Id, cancellationToken);
+
+			string referrer = Request.Headers[HeaderNames.Referer];
+			return Redirect(referrer);
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> AddComment(
+			[FromForm(Name = "userId")] int userId,
+			[FromForm(Name = "text")] string text,
+			CancellationToken cancellationToken = default)
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null)
+			{
+				throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+			}
+
+			await _commentService.Create(userId, user.Id, text, cancellationToken);
 
 			string referrer = Request.Headers[HeaderNames.Referer];
 			return Redirect(referrer);

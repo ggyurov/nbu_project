@@ -11,12 +11,6 @@
 	<div class="col-md-6">
 		<p>Специалност: @Model.Type</p>
 		<p>Град: @Model.City</p>
-
-		<h2>Мнения</h2>
-		@foreach (CommentViewModel comment in Model.Comments)
-		{
-			<p>@comment.Text - @comment.ByUserName</p>
-		}
 	</div>
 	<div class="col-md-6">
 		<div class="row">
@@ -60,6 +54,60 @@
 		</div>
 	</div>
 </div>
+<div class="row">
+	<div class="col-md-12">
+		<table class="table table-bordered table-striped table-hover">
+			<caption>
+				<h2>
+					Мнения
+					<button id="addComment" type="button" class="btn btn-primary">@Localizer["Добави"]</button>
+				</h2>
+			</caption>
+			<thead>
+				<tr>
+					<th style="white-space: nowrap;">Потребител</th>
+					<th style="white-space: nowrap; width: 100%;">Мнение</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (CommentViewModel comment in Model.Comments)
+				{
+					<tr>
+						<td style="white-space: nowrap;">
+							@comment.ByUserName
+						</td>
+						<td style="width: 100%;">
+							@comment.Text
+						</td>
+					</tr>
+				}
+
+				@if (Model.Comments.Length <= 0)
+				{
+					<tr>
+						<td colspan="2">
+							Няма добавени мнения.
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<div id="addCommentDialog" title="Добавяне на мнение" style="display: none;">
+	<form method="post" asp-controller="Manage" asp-action="AddComment">
+		<input name="userId" value="@Model.Id" style="display: none;" />
+		<div asp-validation-summary="All" class="text-danger"></div>
+		<div class="form-group">
+			<label asp-for="CommentText"></label>
+			<textarea asp-for="CommentText" class="form-control" name="text"></textarea>
+			<span asp-validation-for="CommentText" class="text-danger"></span>
+		</div>
+		<button type="submit" class="btn btn-primary">Добави</button>
+	</form>
+</div>
+
 <script>
 	$(function () {
 		$("#btnBlacklist")
@@ -71,5 +119,12 @@
 		$("#selectRate")
 			.prop("disabled", "@Model.IsRated" === "True")
 			.val("@Model.RateValue");
+
+		$("#addComment").on("click", function () {
+			$("#addCommentDialog").dialog({
+				width: 400,
+				modal: true
+			});
+		});
 	});
 </script>
