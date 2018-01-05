@@ -62,7 +62,7 @@ namespace ARSFD.Web.Controllers
 
 			if (ModelState.IsValid)
 			{
-				ApplicationUser user = await _userManager.FindByEmailAsync(model.Email);
+				ApplicationUser user = await _userManager.FindByNameAsync(model.Email);
 				if (user != null)
 				{
 					BlackList[] blacklists = await _userService.GetUserBlackLists(user.Id, cancellationToken);
