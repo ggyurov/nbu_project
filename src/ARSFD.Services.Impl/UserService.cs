@@ -221,7 +221,7 @@ namespace ARSFD.Services.Impl
 				).ToDictionaryAsync(k => k.UserId, v => v.Rating, cancellationToken);
 
 				return await users
-					.Select(x => ConvertUser(x, ratings[x.Id]))
+					.Select(x => ConvertUser(x, 0, ratings))
 					.ToArrayAsync(cancellationToken);
 			}
 			catch (Exception ex)
@@ -276,7 +276,7 @@ namespace ARSFD.Services.Impl
 				).ToDictionaryAsync(k => k.UserId, v => v.Rating, cancellationToken);
 
 				return await users
-					.Select(x => ConvertUser(x, ratings[x.Id]))
+					.Select(x => ConvertUser(x, 0, ratings))
 					.ToArrayAsync(cancellationToken);
 			}
 			catch (Exception ex)
@@ -507,7 +507,8 @@ namespace ARSFD.Services.Impl
 			return workingHour;
 		}
 
-		private static ApplicationUser ConvertUser(DATABASE.ApplicationUser value, double rating = 0)
+		private static ApplicationUser ConvertUser(DATABASE.ApplicationUser value,
+			double rating = 0, IDictionary<int, double> ratingMap = null)
 		{
 			RoleType role = ConvertRole(value.Role);
 
@@ -525,6 +526,12 @@ namespace ARSFD.Services.Impl
 				Type = value.Type,
 				Rating = rating,
 			};
+
+			if (ratingMap != null
+				&& ratingMap.TryGetValue(value.Id, out rating))
+			{
+				user.Rating = rating;
+			}
 
 			return user;
 		}
