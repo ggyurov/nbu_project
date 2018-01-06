@@ -95,24 +95,9 @@ namespace ARSFD.Services.Impl
 					? votes.Average()
 					: 0;
 
-				RoleType role = ConvertRole(user.Role);
+				ApplicationUser app = ConvertUser(user, rating);
 
-				var applicationUser = new ApplicationUser
-				{
-					Id = user.Id,
-					City = user.City,
-					Email = user.Email,
-					EmailConfirmed = user.EmailConfirmed,
-					PasswordHash = user.PasswordHash,
-					UserName = user.UserName,
-					NormalizedUserName = user.NormalizedUserName,
-					Role = role,
-					Name = user.Name,
-					Type = user.Type,
-					Rating = rating
-				};
-
-				return applicationUser;
+				return app;
 			}
 			catch (Exception ex)
 			{
@@ -130,21 +115,16 @@ namespace ARSFD.Services.Impl
 					.Users
 					.FirstAsync(x => x.UserName == userName, cancellationToken);
 
-				RoleType role = ConvertRole(user.Role);
+				int[] votes = _context.Ratings
+					.Where(x => x.UserId == user.Id)
+					.Select(x => x.Value)
+					.ToArray();
 
-				var app = new ApplicationUser
-				{
-					Id = user.Id,
-					City = user.City,
-					Email = user.Email,
-					EmailConfirmed = user.EmailConfirmed,
-					PasswordHash = user.PasswordHash,
-					UserName = user.UserName,
-					NormalizedUserName = user.NormalizedUserName,
-					Role = role,
-					Name = user.Name,
-					Type = user.Type,
-				};
+				double rating = votes != null && votes.Length > 0
+					? votes.Average()
+					: 0;
+
+				ApplicationUser app = ConvertUser(user, rating);
 
 				return app;
 			}
@@ -164,21 +144,16 @@ namespace ARSFD.Services.Impl
 					.Users
 					.FirstAsync(x => x.NormalizedUserName == normalizedUserName, cancellationToken);
 
-				RoleType role = ConvertRole(user.Role);
+				int[] votes = _context.Ratings
+					.Where(x => x.UserId == user.Id)
+					.Select(x => x.Value)
+					.ToArray();
 
-				var app = new ApplicationUser
-				{
-					Id = user.Id,
-					City = user.City,
-					Email = user.Email,
-					EmailConfirmed = user.EmailConfirmed,
-					PasswordHash = user.PasswordHash,
-					UserName = user.UserName,
-					NormalizedUserName = user.NormalizedUserName,
-					Role = role,
-					Name = user.Name,
-					Type = user.Type,
-				};
+				double rating = votes != null && votes.Length > 0
+					? votes.Average()
+					: 0;
+
+				ApplicationUser app = ConvertUser(user, rating);
 
 				return app;
 			}
@@ -188,7 +163,12 @@ namespace ARSFD.Services.Impl
 			}
 		}
 
-		public async Task<ApplicationUser[]> FindDentists(string name, string city, string type, double? rating, CancellationToken cancellationToken = default)
+		public async Task<ApplicationUser[]> FindDentists(
+			string name,
+			string city,
+			string type,
+			double? rating,
+			CancellationToken cancellationToken = default)
 		{
 			try
 			{
@@ -198,17 +178,20 @@ namespace ARSFD.Services.Impl
 				{
 					users = users.Where(x => x.Name.Contains(name));
 				}
+
 				if (city != null)
 				{
 					users = users.Where(x => x.City.Contains(city));
 				}
+
 				if (type != null)
 				{
 					users = users.Where(x => x.Type.Contains(type));
 				}
+
 				if (rating != null)
 				{
-					int[] usersIds = (
+					int[] usersIds = await (
 						from u in users
 						join ur in _context.Ratings
 							on u.Id equals ur.UserId
@@ -220,12 +203,26 @@ namespace ARSFD.Services.Impl
 							Rating = grp.Average(x => x.Value)
 						})
 						.Select(x => x.UserId)
-						.ToArray();
+						.ToArrayAsync(cancellationToken);
 
 					users = users.Where(x => usersIds.Contains(x.Id));
 				}
 
-				return await users.Select(x => ConvertUser(x)).ToArrayAsync(cancellationToken);
+				Dictionary<int, double> ratings = await (
+					from u in users
+					join ur in _context.Ratings
+						on u.Id equals ur.UserId
+					group ur by ur.UserId into grp
+					select new
+					{
+						UserId = grp.Key,
+						Rating = grp.Average(x => x.Value)
+					}
+				).ToDictionaryAsync(k => k.UserId, v => v.Rating, cancellationToken);
+
+				return await users
+					.Select(x => ConvertUser(x, ratings[x.Id]))
+					.ToArrayAsync(cancellationToken);
 			}
 			catch (Exception ex)
 			{
@@ -233,7 +230,10 @@ namespace ARSFD.Services.Impl
 			}
 		}
 
-		public async Task<ApplicationUser[]> FindPatients(string name, double? rating, CancellationToken cancellationToken = default)
+		public async Task<ApplicationUser[]> FindPatients(
+			string name,
+			double? rating,
+			CancellationToken cancellationToken = default)
 		{
 			try
 			{
@@ -246,7 +246,7 @@ namespace ARSFD.Services.Impl
 
 				if (rating != null)
 				{
-					int[] usersIds = (
+					int[] usersIds = await (
 						from u in users
 						join ur in _context.Ratings
 							on u.Id equals ur.UserId
@@ -258,12 +258,26 @@ namespace ARSFD.Services.Impl
 							Rating = grp.Average(x => x.Value)
 						})
 						.Select(x => x.UserId)
-						.ToArray();
+						.ToArrayAsync(cancellationToken);
 
 					users = users.Where(x => usersIds.Contains(x.Id));
 				}
 
-				return await users.Select(x => ConvertUser(x)).ToArrayAsync(cancellationToken);
+				Dictionary<int, double> ratings = await (
+					from u in users
+					join ur in _context.Ratings
+						on u.Id equals ur.UserId
+					group ur by ur.UserId into grp
+					select new
+					{
+						UserId = grp.Key,
+						Rating = grp.Average(x => x.Value)
+					}
+				).ToDictionaryAsync(k => k.UserId, v => v.Rating, cancellationToken);
+
+				return await users
+					.Select(x => ConvertUser(x, ratings[x.Id]))
+					.ToArrayAsync(cancellationToken);
 			}
 			catch (Exception ex)
 			{
@@ -271,7 +285,10 @@ namespace ARSFD.Services.Impl
 			}
 		}
 
-		public async Task<IDictionary<DayOfWeek, WorkingHour[]>> FindWorkingHours(int userId, DayOfWeek[] days = null, CancellationToken cancellationToken = default)
+		public async Task<IDictionary<DayOfWeek, WorkingHour[]>> FindWorkingHours(
+			int userId,
+			DayOfWeek[] days = null,
+			CancellationToken cancellationToken = default)
 		{
 			try
 			{
@@ -490,7 +507,7 @@ namespace ARSFD.Services.Impl
 			return workingHour;
 		}
 
-		private static ApplicationUser ConvertUser(DATABASE.ApplicationUser value)
+		private static ApplicationUser ConvertUser(DATABASE.ApplicationUser value, double rating = 0)
 		{
 			RoleType role = ConvertRole(value.Role);
 
@@ -506,6 +523,7 @@ namespace ARSFD.Services.Impl
 				Role = role,
 				Name = value.Name,
 				Type = value.Type,
+				Rating = rating,
 			};
 
 			return user;
