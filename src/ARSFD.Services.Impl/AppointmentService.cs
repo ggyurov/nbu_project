@@ -121,7 +121,7 @@ namespace ARSFD.Services.Impl
 
 				entities = FilterEntities(entities, filter);
 
-				// TODO: add filtering and paging
+				// TODO: paging
 
 				DATABASE.Appointment[] items = await entities
 					.ToArrayAsync(cancellationToken);
@@ -145,7 +145,37 @@ namespace ARSFD.Services.Impl
 			IQueryable<DATABASE.Appointment> entities,
 			FindAppointmentsFilter filter)
 		{
-			// TODO:
+			if (filter.IsSet(x => x.DoctorId))
+			{
+				entities = entities.Where(x => x.DoctorId == filter.DoctorId);
+			}
+
+			if (filter.IsSet(x => x.UserId))
+			{
+				entities = entities.Where(x => x.UserId == filter.UserId);
+			}
+
+			if (filter.IsSet(x => x.CanceledById))
+			{
+				entities = entities.Where(x => x.CanceledById == filter.CanceledById);
+			}
+
+			if (filter.IsSet(x => x.Canceled))
+			{
+				if (filter.Canceled)
+				{
+					entities = entities.Where(x => x.CanceledOn != null || x.CanceledById != null);
+				}
+				else
+				{
+					entities = entities.Where(x => x.CanceledOn == null && x.CanceledById == null);
+				}
+			}
+
+			if (filter.IsSet(x => x.Date))
+			{
+				entities = entities.Where(x => x.Date.Date == filter.Date.Date);
+			}
 
 			return entities;
 		}
