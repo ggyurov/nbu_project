@@ -1,14 +1,46 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Net;
+using System.Net.Mail;
+using System.Threading.Tasks;
 
 namespace ARSFD.Web.Services
 {
-	// This class is used by the application to send email for account confirmation and password reset.
-	// For more details see https://go.microsoft.com/fwlink/?LinkID=532713
-	public class EmailSender: IEmailSender
+	public class EmailSender : IEmailSender
 	{
-		public Task SendEmailAsync(string email, string subject, string message)
+		public bool Enable { get; set; } = false;
+
+		public async Task SendEmailAsync(string email, string subject, string message)
 		{
-			return Task.CompletedTask;
+			if (Enable == false)
+			{
+				return;
+			}
+
+			try
+			{
+				using (var client = new SmtpClient("smtp.gmail.com", 587))
+				{
+					client.EnableSsl = true;
+					client.DeliveryMethod = SmtpDeliveryMethod.Network;
+					client.UseDefaultCredentials = false;
+					client.Credentials = new NetworkCredential("projectarsfd@gmail.com", "projectarsfd12");
+					client.Timeout = TimeSpan.FromSeconds(2).Milliseconds;
+
+					using (var mailMessage = new MailMessage())
+					{
+						mailMessage.From = new MailAddress("projectarsfd@gmail.com");
+						mailMessage.To.Add(email);
+						mailMessage.Body = message;
+						mailMessage.Subject = subject;
+
+						await client.SendMailAsync(mailMessage);
+					}
+				}
+			}
+			catch
+			{
+
+			}
 		}
 	}
 }

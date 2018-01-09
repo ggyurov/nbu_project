@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using ARSFD.Services;
+﻿using ARSFD.Services;
 using ARSFD.Web.Extensions;
 using ARSFD.Web.Models.AppointmentViewModels;
+using ARSFD.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ARSFD.Web.Controllers
 {
@@ -18,15 +19,18 @@ namespace ARSFD.Web.Controllers
 	{
 		public const string Name = "Appointment";
 
+		private readonly IEmailSender _emailSender;
 		private readonly IUserService _userService;
 		private readonly IAppointmentService _appointmentService;
 		private readonly UserManager<ApplicationUser> _userManager;
 
 		public AppointmentController(
+			IEmailSender emailSender,
 			IUserService userService,
 			IAppointmentService appointmentService,
 			 UserManager<ApplicationUser> userManager)
 		{
+			_emailSender = emailSender ?? throw new ArgumentNullException(nameof(emailSender));
 			_userService = userService ?? throw new ArgumentNullException(nameof(userService));
 			_appointmentService = appointmentService ?? throw new ArgumentNullException(nameof(appointmentService));
 			_userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
@@ -96,6 +100,8 @@ namespace ARSFD.Web.Controllers
 				throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
 			}
 
+			ApplicationUser doctor = await _userService.Get(userId, cancellationToken);
+
 			var appointment = new Appointment
 			{
 				UserId = user.Id,
@@ -105,6 +111,15 @@ namespace ARSFD.Web.Controllers
 
 			await _appointmentService.Create(appointment, cancellationToken);
 
+			await _emailSender.SendEmailAsync(
+				doctor.Email,
+				"Записан час",
+$@"
+Име: {user.Name}
+Email: {user.Email}
+Дата: {appointment.Date}
+"
+);
 			string referrer = Request.Headers[HeaderNames.Referer];
 			return Redirect(referrer);
 		}
@@ -207,11 +222,24 @@ namespace ARSFD.Web.Controllers
 			{
 				throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
 			}
-			
+
+			Appointment appointment = await _appointmentService.Get(id, cancellationToken);
+
+			ApplicationUser not = await _userService.Get(user.Role == RoleType.Doctor ? appointment.DoctorId : appointment.UserId, cancellationToken);
+
 			await _appointmentService.Cancel(id, user.Id, cancellationToken);
 
-			string referrer = Request.Headers[HeaderNames.Referer];
+			await _emailSender.SendEmailAsync(
+	not.Email,
+	"Анулиран час",
+$@"
+От: {user.Name}
+Email: {user.Email}
+Дата: {appointment.Date}
+"
+);
 
+			string referrer = Request.Headers[HeaderNames.Referer];
 			return Redirect(referrer);
 		}
 	}

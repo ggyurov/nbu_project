@@ -14,7 +14,7 @@ namespace ARSFD.Web.Controllers
 {
 	[Authorize]
 	[Route("[controller]/[action]")]
-	public class AccountController: Controller
+	public class AccountController : Controller
 	{
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly SignInManager<ApplicationUser> _signInManager;
@@ -150,9 +150,7 @@ namespace ARSFD.Web.Controllers
 					// Refresh user to get the ID
 					user = await _userManager.FindByNameAsync(user.UserName);
 
-					var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-					var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
-					await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl);
+					await _emailSender.SendEmailAsync(user.Email, "Успешна регистрация", string.Empty);
 
 					await _signInManager.SignInAsync(user, isPersistent: false);
 
