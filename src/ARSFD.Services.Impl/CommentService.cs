@@ -19,7 +19,27 @@ namespace ARSFD.Services.Impl
 
 		#region ICommentService members
 
-		public async Task<Comment[]> GetCommentsForUser(int userId, CancellationToken cancellationToken)
+		public async Task Create(int userId, int byUserId, string text, CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				var comment = new DATABASE.Comment
+				{
+					UserId = userId,
+					ByUserId = byUserId,
+					Text = text,
+				};
+
+				await _context.Comments.AddAsync(comment, cancellationToken);
+				await _context.SaveChangesAsync(cancellationToken);
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceException($"Failed to get comments for user with ID `{userId}`.", ex);
+			}
+		}
+
+		public async Task<Comment[]> GetCommentsForUser(int userId, CancellationToken cancellationToken = default)
 		{
 			try
 			{

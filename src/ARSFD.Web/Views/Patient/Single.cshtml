@@ -1,5 +1,125 @@
-﻿
+﻿@using ARSFD.Web.Models.PatientViewModels
+@using ARSFD.Web.Models.CommentViewModels
+@using ARSFD.Services
+@model PatientViewModel
 @{
-	ViewData["Title"] = "Single";
+	ViewData["Title"] = Model.Name;
 }
-<h2>Single</h2>
+
+<h2>Пациент - @Model.Name</h2>
+<div class="row" style="margin-top: 50px;">
+	<div class="col-md-6">
+		@*<p>Специалност: @Model.Type</p>
+			<p>Град: @Model.City</p>*@
+	</div>
+	<div class="col-md-6">
+		<div class="row" style="margin-top: 5px;">
+			<div class="col-md-12">
+				<form method="post" asp-controller="Manage" asp-action="Rate">
+					<input name="id" value="@Model.Id" style="display: none;" />
+					<div class="row">
+						<div class="col-md-2">
+							<button id="btnRate" type="submit" class="btn btn-primary">Оцени</button>
+						</div>
+						<div class="col-md-4">
+							<select id="selectRate" name="value" class="form-control" style="width: 70px;">
+								<option selected value="1">1</option>
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5">5</option>
+								<option value="6">6</option>
+								<option value="7">7</option>
+								<option value="8">8</option>
+								<option value="9">9</option>
+								<option value="10">10</option>
+							</select>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="row" style="margin-top: 5px;">
+			<div class="col-md-12">
+				<form method="post" asp-controller="Manage" asp-action="AddToBlackList">
+					<input name="id" value="@Model.Id" style="display: none;" />
+					<button id="btnBlacklist" type="submit" class="btn btn-primary">Включи в черен списък</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<table class="table table-bordered table-striped table-hover">
+			<caption>
+				<h2>
+					Мнения
+					<button id="addComment" type="button" class="btn btn-primary">@Localizer["Добави"]</button>
+				</h2>
+			</caption>
+			<thead>
+				<tr>
+					<th style="white-space: nowrap;">Потребител</th>
+					<th style="white-space: nowrap; width: 100%;">Мнение</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (CommentViewModel comment in Model.Comments)
+				{
+					<tr>
+						<td style="white-space: nowrap;">
+							@comment.ByUserName
+						</td>
+						<td style="width: 100%;">
+							@comment.Text
+						</td>
+					</tr>
+				}
+
+				@if (Model.Comments.Length <= 0)
+				{
+					<tr>
+						<td colspan="2">
+							Няма добавени мнения.
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<div id="addCommentDialog" title="Добавяне на мнение" style="display: none;">
+	<form method="post" asp-controller="Manage" asp-action="AddComment">
+		<input name="userId" value="@Model.Id" style="display: none;" />
+		<div asp-validation-summary="All" class="text-danger"></div>
+		<div class="form-group">
+			<label asp-for="CommentText"></label>
+			<textarea asp-for="CommentText" class="form-control" name="text"></textarea>
+			<span asp-validation-for="CommentText" class="text-danger"></span>
+		</div>
+		<button type="submit" class="btn btn-primary">Добави</button>
+	</form>
+</div>
+
+<script>
+	$(function () {
+		$("#btnBlacklist")
+			.prop("disabled", "@Model.IsBlackListed" === "True");
+
+		$("#btnRate")
+			.prop("disabled", "@Model.IsRated" === "True");
+
+		$("#selectRate")
+			.prop("disabled", "@Model.IsRated" === "True")
+			.val("@Model.RateValue");
+
+		$("#addComment").on("click", function () {
+			$("#addCommentDialog").dialog({
+				width: 400,
+				modal: true
+			});
+		});
+	});
+</script>

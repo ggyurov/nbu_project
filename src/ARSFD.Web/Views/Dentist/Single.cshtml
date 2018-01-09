@@ -1,17 +1,259 @@
 ﻿@using ARSFD.Web.Models.DentistViewModels
 @using ARSFD.Web.Models.CommentViewModels
+@using ARSFD.Web.Controllers
+@using ARSFD.Services
 @model DentistViewModel
 @{
 	ViewData["Title"] = Model.Name;
 }
 
-<h2>@Model.Name</h2>
+<h2>Зъболекар - @Model.Name</h2>
+<div class="row" style="margin-top: 50px;">
+	<div class="col-md-6">
+		<p>Специалност: @Model.Type</p>
+		<p>Град: @Model.City</p>
+	</div>
+	<div class="col-md-6">
+		<div class="row">
+			<div class="col-md-12">
+				<button id="btnAddAppointment" type="button" class="btn btn-primary">Запиши час</button>
+			</div>
+		</div>
+		<div class="row" style="margin-top: 5px;">
+			<div class="col-md-12">
+				<form method="post" asp-controller="Manage" asp-action="Rate">
+					<input name="id" value="@Model.Id" style="display: none;" />
+					<div class="row">
+						<div class="col-md-2">
+							<button id="btnRate" type="submit" class="btn btn-primary">Оцени</button>
+						</div>
+						<div class="col-md-4">
+							<select id="selectRate" name="value" class="form-control" style="width: 70px;">
+								<option selected value="1">1</option>
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5">5</option>
+								<option value="6">6</option>
+								<option value="7">7</option>
+								<option value="8">8</option>
+								<option value="9">9</option>
+								<option value="10">10</option>
+							</select>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div class="row" style="margin-top: 5px;">
+			<div class="col-md-12">
+				<form method="post" asp-controller="Manage" asp-action="AddToBlackList">
+					<input name="id" value="@Model.Id" style="display: none;" />
+					<button id="btnBlacklist" type="submit" class="btn btn-primary">Включи в черен списък</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-12">
+		<table class="table table-bordered table-striped table-hover">
+			<caption>
+				<h2>
+					Мнения
+					<button id="addComment" type="button" class="btn btn-primary">@Localizer["Добави"]</button>
+				</h2>
+			</caption>
+			<thead>
+				<tr>
+					<th style="white-space: nowrap;">Потребител</th>
+					<th style="white-space: nowrap; width: 100%;">Мнение</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (CommentViewModel comment in Model.Comments)
+				{
+					<tr>
+						<td style="white-space: nowrap;">
+							@comment.ByUserName
+						</td>
+						<td style="width: 100%;">
+							@comment.Text
+						</td>
+					</tr>
+				}
 
-<p>Специалност: @Model.Type</p>
-<p>Град: @Model.City</p>
+				@if (Model.Comments.Length <= 0)
+				{
+					<tr>
+						<td colspan="2">
+							Няма добавени мнения.
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+<div id="addCommentDialog" title="Добавяне на мнение" style="display: none;">
+	<form method="post" asp-controller="Manage" asp-action="AddComment">
+		<input name="userId" value="@Model.Id" style="display: none;" />
+		<div asp-validation-summary="All" class="text-danger"></div>
+		<div class="form-group">
+			<label asp-for="CommentText"></label>
+			<textarea asp-for="CommentText" class="form-control" name="text"></textarea>
+			<span asp-validation-for="CommentText" class="text-danger"></span>
+		</div>
+		<button type="submit" class="btn btn-primary">Добави</button>
+	</form>
+</div>
+<div id="addAppointmentDialog" title="Записване час" style="display: none; overflow: hidden;">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="input-group">
+				<div class="input-group-btn">
+					<!-- Buttons -->
+				</div>
+				<div class="form-group">
+					<label for="addAppointmentDatePicker">Дата</label>
+					<input type="text" id="addAppointmentDatePicker" />
+				</div>
+				@*<input type="text" disabled="disabled" class="form-control" value="Monday" />*@
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<table class="table table-bordered table-striped table-hover table-selectable">
+				<caption>
+					<h3>
+						Свободни часове
+					</h3>
+				</caption>
+				<thead>
+					<tr>
+						<th style="white-space: nowrap;">Начало</th>
+						<th style="white-space: nowrap;">Край</th>
+					</tr>
+				</thead>
+				<tbody id="free-hours"></tbody>
+				<tbody id="no-hours">
+					<tr>
+						<td colspan="2">
+							Няма свободни часове.
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<form method="post" asp-controller="Appointment" asp-action="Save">
+				<input name="userId" value="@Model.Id" style="display: none;" />
+				<input id="saveDate" name="date" value="" style="display: none;" />
+				<button id="btnSaveAppointment" type="submit" class="btn btn-primary">Запиши</button>
+			</form>
+		</div>
+	</div>
+</div>
 
-<h2>Мнения</h2>
-@foreach (CommentViewModel comment in Model.Comments)
-{
-	<p>@comment.Text - @comment.ByUserName</p>
-}
+<script>
+	$(function () {
+		$("#btnBlacklist")
+			.prop("disabled", "@Model.IsBlackListed" === "True");
+
+		$("#btnRate")
+			.prop("disabled", "@Model.IsRated" === "True");
+
+		$("#selectRate")
+			.prop("disabled", "@Model.IsRated" === "True")
+			.val("@Model.RateValue");
+
+		$("#addComment").on("click", function () {
+			$("#addCommentDialog").dialog({
+				width: 400,
+				modal: true
+			});
+		});
+
+		var btnSaveAppointment = $("#btnSaveAppointment");
+
+		$("#btnAddAppointment").on("click", function () {
+			$("#addAppointmentDialog").dialog({
+				width: 800,
+				modal: true
+			});
+
+			var datePicker = $("#addAppointmentDatePicker");
+			var dateToday = new Date();
+
+			datePicker.datepicker({
+				showOn: "button",
+				minDate: dateToday
+			});
+
+			datePicker.on("change", function () {
+				var date = $(this).datepicker("getDate");
+				var baseUrl = "@Url.Action(nameof(AppointmentController.FreeAppointments), AppointmentController.Name, new { userId = Model.Id })";
+				var url = baseUrl + "&date=" + date.toISOString();
+
+				$.get(url)
+					.fail(function () {
+						console.log("Fail");
+					})
+					.done(function (data) {
+						ensureFreeAppointments(data);
+					});
+			});
+
+			datePicker.datepicker("setDate", dateToday);
+			datePicker.trigger("change");
+		});
+
+		var freeHoursTBody = $("#free-hours");
+		var noHoursTBody = $("#no-hours");
+
+		function ensureFreeAppointments(data) {
+			freeHoursTBody.empty();
+			noHoursTBody.hide();
+			btnSaveAppointment.prop("disabled", true);
+
+			if (data && data.length && data.length > 0) {
+				for (var i = 0; i < data.length; i++) {
+					var appointmentItem = data[i];
+
+					var row = $("<tr />");
+					var col1 = $("<td />");
+					var col2 = $("<td />");
+
+					var startDate = new Date(appointmentItem.StartTime);
+					var endDate = new Date(appointmentItem.EndTime);
+
+					row.data("date", startDate);
+					col1.text(startDate.toLocaleTimeString("bg", { hour12: false }));
+					col2.text(endDate.toLocaleTimeString("bg", { hour12: false }));
+
+					col1.appendTo(row);
+					col2.appendTo(row);
+					row.appendTo(freeHoursTBody);
+				}
+
+				var freeHoursRows = freeHoursTBody.find("tr");
+
+				freeHoursRows.click(function () {
+					freeHoursRows.removeClass("selected");
+
+					$(this).addClass("selected");
+
+					btnSaveAppointment.prop("disabled", false);
+
+					var date = $(this).data("date");
+					$("#saveDate").val(date.toISOString());
+				});
+			} else {
+				noHoursTBody.show();
+			}
+		}
+	});
+</script>

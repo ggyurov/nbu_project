@@ -40,7 +40,9 @@ namespace ARSFD.Web
 			services
 				.AddScoped<SERVICES.IAppointmentService, AppointmentService>()
 				.AddScoped<SERVICES.ICommentService, CommentService>()
-				.AddScoped<SERVICES.IUserService, UserService>();
+				.AddScoped<SERVICES.IUserService, UserService>()
+				.AddScoped<SERVICES.IEventService, EventService>()
+				.AddScoped<SERVICES.IRatingService, RatingService>();
 
 			services.AddAuthentication();
 

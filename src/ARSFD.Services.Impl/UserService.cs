@@ -86,26 +86,18 @@ namespace ARSFD.Services.Impl
 					.Users
 					.FirstAsync(x => x.Id == id, cancellationToken);
 
-				double rating = _context.Ratings.Where(x => x.UserId == id).Select(x => x.Value).DefaultIfEmpty(0).Average();
+				int[] votes = _context.Ratings
+					.Where(x => x.UserId == id)
+					.Select(x => x.Value)
+					.ToArray();
 
-				RoleType role = ConvertRole(user.Role);
+				double rating = votes != null && votes.Length > 0
+					? votes.Average()
+					: 0;
 
-				var applicationUser = new ApplicationUser
-				{
-					Id = user.Id,
-					City = user.City,
-					Email = user.Email,
-					EmailConfirmed = user.EmailConfirmed,
-					PasswordHash = user.PasswordHash,
-					UserName = user.UserName,
-					NormalizedUserName = user.NormalizedUserName,
-					Role = role,
-					Name = user.Name,
-					Type = user.Type,
-					Rating = rating
-				};
+				ApplicationUser app = ConvertUser(user, rating);
 
-				return applicationUser;
+				return app;
 			}
 			catch (Exception ex)
 			{
@@ -123,21 +115,16 @@ namespace ARSFD.Services.Impl
 					.Users
 					.FirstAsync(x => x.UserName == userName, cancellationToken);
 
-				RoleType role = ConvertRole(user.Role);
+				int[] votes = _context.Ratings
+					.Where(x => x.UserId == user.Id)
+					.Select(x => x.Value)
+					.ToArray();
 
-				var app = new ApplicationUser
-				{
-					Id = user.Id,
-					City = user.City,
-					Email = user.Email,
-					EmailConfirmed = user.EmailConfirmed,
-					PasswordHash = user.PasswordHash,
-					UserName = user.UserName,
-					NormalizedUserName = user.NormalizedUserName,
-					Role = role,
-					Name = user.Name,
-					Type = user.Type,
-				};
+				double rating = votes != null && votes.Length > 0
+					? votes.Average()
+					: 0;
+
+				ApplicationUser app = ConvertUser(user, rating);
 
 				return app;
 			}
@@ -157,21 +144,16 @@ namespace ARSFD.Services.Impl
 					.Users
 					.FirstAsync(x => x.NormalizedUserName == normalizedUserName, cancellationToken);
 
-				RoleType role = ConvertRole(user.Role);
+				int[] votes = _context.Ratings
+					.Where(x => x.UserId == user.Id)
+					.Select(x => x.Value)
+					.ToArray();
 
-				var app = new ApplicationUser
-				{
-					Id = user.Id,
-					City = user.City,
-					Email = user.Email,
-					EmailConfirmed = user.EmailConfirmed,
-					PasswordHash = user.PasswordHash,
-					UserName = user.UserName,
-					NormalizedUserName = user.NormalizedUserName,
-					Role = role,
-					Name = user.Name,
-					Type = user.Type,
-				};
+				double rating = votes != null && votes.Length > 0
+					? votes.Average()
+					: 0;
+
+				ApplicationUser app = ConvertUser(user, rating);
 
 				return app;
 			}
@@ -181,7 +163,12 @@ namespace ARSFD.Services.Impl
 			}
 		}
 
-		public async Task<ApplicationUser[]> FindDentists(string name, string city, string type, double? rating, CancellationToken cancellationToken = default)
+		public async Task<ApplicationUser[]> FindDentists(
+			string name,
+			string city,
+			string type,
+			double? rating,
+			CancellationToken cancellationToken = default)
 		{
 			try
 			{
@@ -191,17 +178,20 @@ namespace ARSFD.Services.Impl
 				{
 					users = users.Where(x => x.Name.Contains(name));
 				}
+
 				if (city != null)
 				{
 					users = users.Where(x => x.City.Contains(city));
 				}
+
 				if (type != null)
 				{
 					users = users.Where(x => x.Type.Contains(type));
 				}
+
 				if (rating != null)
 				{
-					int[] usersIds = (
+					int[] usersIds = await (
 						from u in users
 						join ur in _context.Ratings
 							on u.Id equals ur.UserId
@@ -213,12 +203,26 @@ namespace ARSFD.Services.Impl
 							Rating = grp.Average(x => x.Value)
 						})
 						.Select(x => x.UserId)
-						.ToArray();
+						.ToArrayAsync(cancellationToken);
 
 					users = users.Where(x => usersIds.Contains(x.Id));
 				}
 
-				return await users.Select(x => ConvertUser(x)).ToArrayAsync(cancellationToken);
+				Dictionary<int, double> ratings = await (
+					from u in users
+					join ur in _context.Ratings
+						on u.Id equals ur.UserId
+					group ur by ur.UserId into grp
+					select new
+					{
+						UserId = grp.Key,
+						Rating = grp.Average(x => x.Value)
+					}
+				).ToDictionaryAsync(k => k.UserId, v => v.Rating, cancellationToken);
+
+				return await users
+					.Select(x => ConvertUser(x, 0, ratings))
+					.ToArrayAsync(cancellationToken);
 			}
 			catch (Exception ex)
 			{
@@ -226,7 +230,10 @@ namespace ARSFD.Services.Impl
 			}
 		}
 
-		public async Task<ApplicationUser[]> FindPatients(string name, double? rating, CancellationToken cancellationToken = default)
+		public async Task<ApplicationUser[]> FindPatients(
+			string name,
+			double? rating,
+			CancellationToken cancellationToken = default)
 		{
 			try
 			{
@@ -239,7 +246,7 @@ namespace ARSFD.Services.Impl
 
 				if (rating != null)
 				{
-					int[] usersIds = (
+					int[] usersIds = await (
 						from u in users
 						join ur in _context.Ratings
 							on u.Id equals ur.UserId
@@ -251,12 +258,26 @@ namespace ARSFD.Services.Impl
 							Rating = grp.Average(x => x.Value)
 						})
 						.Select(x => x.UserId)
-						.ToArray();
+						.ToArrayAsync(cancellationToken);
 
 					users = users.Where(x => usersIds.Contains(x.Id));
 				}
 
-				return await users.Select(x => ConvertUser(x)).ToArrayAsync(cancellationToken);
+				Dictionary<int, double> ratings = await (
+					from u in users
+					join ur in _context.Ratings
+						on u.Id equals ur.UserId
+					group ur by ur.UserId into grp
+					select new
+					{
+						UserId = grp.Key,
+						Rating = grp.Average(x => x.Value)
+					}
+				).ToDictionaryAsync(k => k.UserId, v => v.Rating, cancellationToken);
+
+				return await users
+					.Select(x => ConvertUser(x, 0, ratings))
+					.ToArrayAsync(cancellationToken);
 			}
 			catch (Exception ex)
 			{
@@ -264,7 +285,10 @@ namespace ARSFD.Services.Impl
 			}
 		}
 
-		public async Task<IDictionary<DayOfWeek, WorkingHour[]>> FindWorkingHours(int userId, DayOfWeek[] days = null, CancellationToken cancellationToken = default)
+		public async Task<IDictionary<DayOfWeek, WorkingHour[]>> FindWorkingHours(
+			int userId,
+			DayOfWeek[] days = null,
+			CancellationToken cancellationToken = default)
 		{
 			try
 			{
@@ -326,6 +350,147 @@ namespace ARSFD.Services.Impl
 			}
 		}
 
+		public async Task RemoveWorkingHour(
+			int id,
+			CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				DATABASE.WorkingHour entity = await _context.WorkingHours
+					.FirstAsync(x => x.Id == id, cancellationToken);
+
+				_context.WorkingHours.Remove(entity);
+
+				await _context.SaveChangesAsync(cancellationToken);
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceException($"Failed to remove working hour `{id}`.", ex);
+			}
+		}
+
+		public async Task AddToBlackList(
+			int userId,
+			int byUserId,
+			CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				bool blacklisted = await _context.BlackLists
+					.AnyAsync(x => x.UserId == userId && x.ByUserId == byUserId, cancellationToken);
+
+				if (blacklisted)
+				{
+					throw new Exception("Already blacklisted.");
+				}
+
+				var item = new DATABASE.BlackList
+				{
+					UserId = userId,
+					ByUserId = byUserId,
+				};
+
+				await _context.BlackLists.AddAsync(item, cancellationToken);
+				await _context.SaveChangesAsync(cancellationToken);
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceException($"Failed to add to blacklist.", ex);
+			}
+		}
+
+		public async Task RemoveFromBlackList(
+			int userId,
+			int byUserId,
+			CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				DATABASE.BlackList item = await _context.BlackLists
+					.FirstAsync(x => x.UserId == userId && x.ByUserId == byUserId, cancellationToken);
+
+				_context.BlackLists.Remove(item);
+
+				await _context.SaveChangesAsync(cancellationToken);
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceException($"Failed to remove to blacklist.", ex);
+			}
+		}
+
+		public async Task<BlackList[]> GetUserBlackLists(
+			int id,
+			CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				DATABASE.BlackList[] items = await _context.BlackLists
+					.Where(x => x.UserId == id)
+					.ToArrayAsync(cancellationToken);
+
+				return items.Select(x => new BlackList
+				{
+					Id = x.Id,
+					ByUserId = x.ByUserId,
+					UserId = x.UserId,
+				}).ToArray();
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceException($"Failed to get to blacklists.", ex);
+			}
+		}
+
+		public async Task<BlackList[]> GetByUserBlackLists(
+			int id,
+			CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				DATABASE.BlackList[] items = await _context.BlackLists
+					.Where(x => x.ByUserId == id)
+					.ToArrayAsync(cancellationToken);
+
+				return items.Select(x => new BlackList
+				{
+					Id = x.Id,
+					ByUserId = x.ByUserId,
+					UserId = x.UserId,
+				}).ToArray();
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceException($"Failed to get to blacklists.", ex);
+			}
+		}
+
+		public async Task UpdateNames(
+			int userId,
+			string names,
+			CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				if (string.IsNullOrEmpty(names))
+				{
+					throw new ArgumentNullException(nameof(names));
+				}
+
+				DATABASE.ApplicationUser user = await _context.Users
+					.FirstAsync(x => x.Id == userId, cancellationToken);
+
+				// Update name
+				user.Name = names;
+
+				await _context.SaveChangesAsync(cancellationToken);
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceException($"Failed to update user names.", ex);
+			}
+		}
+
 		#endregion
 
 		private static WorkingHour ConvertWorkingHour(DATABASE.WorkingHour value)
@@ -342,7 +507,8 @@ namespace ARSFD.Services.Impl
 			return workingHour;
 		}
 
-		private static ApplicationUser ConvertUser(DATABASE.ApplicationUser value)
+		private static ApplicationUser ConvertUser(DATABASE.ApplicationUser value,
+			double rating = 0, IDictionary<int, double> ratingMap = null)
 		{
 			RoleType role = ConvertRole(value.Role);
 
@@ -358,7 +524,14 @@ namespace ARSFD.Services.Impl
 				Role = role,
 				Name = value.Name,
 				Type = value.Type,
+				Rating = rating,
 			};
+
+			if (ratingMap != null
+				&& ratingMap.TryGetValue(value.Id, out rating))
+			{
+				user.Rating = rating;
+			}
 
 			return user;
 		}

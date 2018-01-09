@@ -16,25 +16,33 @@
 			</caption>
 			<thead>
 				<tr>
-					<th>Ден</th>
-					<th>Начало</th>
-					<th>Край</th>
+					<th style="white-space: nowrap;">Ден</th>
+					<th style="white-space: nowrap;">Начало</th>
+					<th style="white-space: nowrap;">Край</th>
+					<th style="white-space: nowrap;"></th>
 				</tr>
 			</thead>
 			<tbody>
 				@foreach (WorkingHourListItemViewModel viewModel in Model.WorkingHours)
 				{
 					<tr>
-						<td>@DateTimeFormatInfo.CurrentInfo.GetDayName(viewModel.DayOfWeek)</td>
-						<td>@viewModel.StartTime.ToShortTimeString()</td>
-						<td>@viewModel.EndTime.ToShortTimeString()</td>
+						<td style="width: 30%; white-space: nowrap;">@DateTimeFormatInfo.CurrentInfo.GetDayName(viewModel.DayOfWeek)</td>
+						<td style="width: 30%; white-space: nowrap;">@viewModel.StartTime.ToShortTimeString()</td>
+						<td style="width: 30%; white-space: nowrap;">@viewModel.EndTime.ToShortTimeString()</td>
+						<td style="white-space: nowrap;">
+							<form method="post" asp-controller="Manage" asp-action="RemoveWorkingHour">
+								<input name="id" value="@viewModel.Id" style="display: none;" />
+								<button type="submit" class="btn btn-default">Премахни</button>
+							</form>
+
+						</td>
 					</tr>
 				}
 
 				@if (Model.WorkingHours.Length <= 0)
 				{
 					<tr>
-						<td colspan="3">
+						<td colspan="4">
 							Няма добавено работно време.
 						</td>
 					</tr>
@@ -70,7 +78,7 @@
 			<input type="text" name="endTime" class="form-control" placeholder="00:00" />
 			<span asp-validation-for="Add.EndTime" class="text-danger"></span>
 		</div>
-		<button type="submit" class="btn btn-default">Добави</button>
+		<button type="submit" class="btn btn-primary">Добави</button>
 	</form>
 </div>
 <script>

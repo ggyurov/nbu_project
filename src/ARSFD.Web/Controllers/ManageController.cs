@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Net.Http.Headers;
 
 namespace ARSFD.Web.Controllers
 {
@@ -20,6 +21,8 @@ namespace ARSFD.Web.Controllers
 	{
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly SignInManager<ApplicationUser> _signInManager;
+		private readonly IRatingService _ratingService;
+		private readonly ICommentService _commentService;
 		private readonly IUserService _userService;
 		private readonly IEmailSender _emailSender;
 		private readonly ILogger _logger;
@@ -28,6 +31,8 @@ namespace ARSFD.Web.Controllers
 		public ManageController(
 			UserManager<ApplicationUser> userManager,
 			SignInManager<ApplicationUser> signInManager,
+			IRatingService ratingService,
+			ICommentService commentService,
 			IUserService userService,
 			IEmailSender emailSender,
 			ILogger<ManageController> logger,
@@ -35,6 +40,8 @@ namespace ARSFD.Web.Controllers
 		{
 			_userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
 			_signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
+			_ratingService = ratingService ?? throw new ArgumentNullException(nameof(ratingService));
+			_commentService = commentService ?? throw new ArgumentNullException(nameof(commentService));
 			_userService = userService ?? throw new ArgumentNullException(nameof(userService));
 			_emailSender = emailSender ?? throw new ArgumentNullException(nameof(emailSender));
 			_logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -67,27 +74,31 @@ namespace ARSFD.Web.Controllers
 
 		[HttpPost]
 		[ValidateAntiForgeryToken]
-		public async Task<IActionResult> Index(IndexViewModel model)
+		public async Task<IActionResult> Index(IndexViewModel model, CancellationToken cancellationToken = default)
 		{
 			if (!ModelState.IsValid)
 			{
 				return View(model);
 			}
 
-			var user = await _userManager.GetUserAsync(User);
+			ApplicationUser user = await _userManager.GetUserAsync(User);
 			if (user == null)
 			{
 				throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
 			}
 
-			var email = user.Email;
-			if (model.Email != email)
+			if (model.Email != user.Email)
 			{
-				var setEmailResult = await _userManager.SetEmailAsync(user, model.Email);
+				IdentityResult setEmailResult = await _userManager.SetEmailAsync(user, model.Email);
 				if (!setEmailResult.Succeeded)
 				{
 					throw new ApplicationException($"Unexpected error occurred setting email for user with ID '{user.Id}'.");
 				}
+			}
+
+			if (model.Names != user.Name)
+			{
+				await _userService.UpdateNames(user.Id, model.Names, cancellationToken);
 			}
 
 			StatusMessage = "Your profile has been updated";
@@ -190,6 +201,7 @@ namespace ARSFD.Web.Controllers
 				.ThenBy(x => x.StartTime)
 				.Select(x => new WorkingHourListItemViewModel
 				{
+					Id = x.Id,
 					DayOfWeek = x.DayOfWeek,
 					StartTime = x.StartTime,
 					EndTime = x.EndTime,
@@ -238,6 +250,69 @@ namespace ARSFD.Web.Controllers
 			await _userService.AddWorkingHour(workingHour, cancellationToken);
 
 			return RedirectToAction(nameof(WorkingHours));
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> RemoveWorkingHour(
+			[FromForm(Name = "id")] int id,
+			CancellationToken cancellationToken = default)
+		{
+			await _userService.RemoveWorkingHour(id, cancellationToken);
+
+			return RedirectToAction(nameof(WorkingHours));
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> AddToBlackList(
+			[FromForm(Name = "id")] int id,
+			CancellationToken cancellationToken = default)
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null)
+			{
+				throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+			}
+
+			await _userService.AddToBlackList(id, user.Id, cancellationToken);
+
+			string referrer = Request.Headers[HeaderNames.Referer];
+			return Redirect(referrer);
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> Rate(
+			[FromForm(Name = "id")] int id,
+			[FromForm(Name = "value")] int value,
+			CancellationToken cancellationToken = default)
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null)
+			{
+				throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+			}
+
+			await _ratingService.SetRating(id, value, user.Id, cancellationToken);
+
+			string referrer = Request.Headers[HeaderNames.Referer];
+			return Redirect(referrer);
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> AddComment(
+			[FromForm(Name = "userId")] int userId,
+			[FromForm(Name = "text")] string text,
+			CancellationToken cancellationToken = default)
+		{
+			var user = await _userManager.GetUserAsync(User);
+			if (user == null)
+			{
+				throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+			}
+
+			await _commentService.Create(userId, user.Id, text, cancellationToken);
+
+			string referrer = Request.Headers[HeaderNames.Referer];
+			return Redirect(referrer);
 		}
 
 		[HttpGet]

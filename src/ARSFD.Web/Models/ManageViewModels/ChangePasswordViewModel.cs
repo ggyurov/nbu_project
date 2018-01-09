@@ -4,20 +4,20 @@ namespace ARSFD.Web.Models.ManageViewModels
 {
 	public class ChangePasswordViewModel
 	{
-		[Required]
+		[Required(ErrorMessage = "Полето `{0}` е задължително.")]
 		[DataType(DataType.Password)]
-		[Display(Name = "Current password")]
+		[Display(Name = "Текуща парола")]
 		public string OldPassword { get; set; }
 
-		[Required]
-		[StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+		[Required(ErrorMessage = "Полето `{0}` е задължително.")]
+		[StringLength(100, ErrorMessage = "`{0}` трябва да бъде от `{1}` до `{2}` символа.", MinimumLength = 6)]
 		[DataType(DataType.Password)]
-		[Display(Name = "New password")]
+		[Display(Name = "Нова парола")]
 		public string NewPassword { get; set; }
 
 		[DataType(DataType.Password)]
-		[Display(Name = "Confirm new password")]
-		[Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match.")]
+		[Display(Name = "Повтори нова парола")]
+		[Compare("NewPassword", ErrorMessage = "Паролата не съвпада.")]
 		public string ConfirmPassword { get; set; }
 
 		public string StatusMessage { get; set; }

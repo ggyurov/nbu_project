@@ -43,5 +43,32 @@ namespace ARSFD.Services
 		Task AddWorkingHour(
 			WorkingHour workingHour,
 			CancellationToken cancellationToken = default);
+
+		Task RemoveWorkingHour(
+			int id,
+			CancellationToken cancellationToken = default);
+
+		Task AddToBlackList(
+			int userId,
+			int byUserId,
+			CancellationToken cancellationToken = default);
+
+		Task RemoveFromBlackList(
+			int userId,
+			int byUserId,
+			CancellationToken cancellationToken = default);
+
+		Task<BlackList[]> GetUserBlackLists(
+			int id,
+			CancellationToken cancellationToken = default);
+
+		Task<BlackList[]> GetByUserBlackLists(
+			int id,
+			CancellationToken cancellationToken = default);
+
+		Task UpdateNames(
+			int userId,
+			string names,
+			CancellationToken cancellationToken = default);
 	}
 }
