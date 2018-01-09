@@ -11,6 +11,7 @@ namespace ARSFD.Services
 
 		Task Cancel(
 			int appointmentId,
+			int userId,
 			CancellationToken cancellationToken = default);
 
 		Task<Appointment> Get(

@@ -14,7 +14,7 @@ using Microsoft.Net.Http.Headers;
 namespace ARSFD.Web.Controllers
 {
 	[Route("appointment")]
-	public class AppointmentController: Controller
+	public class AppointmentController : Controller
 	{
 		public const string Name = "Appointment";
 
@@ -35,13 +35,40 @@ namespace ARSFD.Web.Controllers
 		[HttpGet]
 		[Route("")]
 		public async Task<IActionResult> Index(
-			[FromQuery(Name = "Name")] string name,
-			[FromQuery(Name = "City")] string city,
-			[FromQuery(Name = "Type")] string type,
-			[FromQuery(Name = "Rating")] double? rating,
 			CancellationToken cancellationToken = default)
 		{
 			var model = new AppointmentIndexViewModel();
+
+			ApplicationUser user = await _userManager.GetUserAsync(User);
+			if (user == null)
+			{
+				throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+			}
+
+			var filter = new FindAppointmentsFilter();
+			if (user.Role == RoleType.Doctor)
+			{
+				filter.DoctorId = user.Id;
+			}
+			else
+			{
+				filter.UserId = user.Id;
+			}
+
+			FindResult<Appointment> appointments = await _appointmentService.Find(filter, cancellationToken: cancellationToken);
+
+			model.Appointments = appointments.Items.Select(x => new AppointmentViewModel
+			{
+				CanceledById = x.CanceledById,
+				CanceledOn = x.CanceledOn,
+				Date = x.Date,
+				DoctorId = x.DoctorId,
+				DoctorName = _userService.Get(x.DoctorId).Result.Name,
+				Id = x.Id,
+				UserId = x.UserId,
+				UserName = _userService.Get(x.UserId).Result.Name,
+				CancelUrl = Url.Action("Cancel", new { id = x.Id })
+			}).ToArray();
 
 			return View(model);
 		}
@@ -167,6 +194,25 @@ namespace ARSFD.Web.Controllers
 			{
 				return this.HandleException(ex);
 			}
+		}
+
+		[HttpPost]
+		[Route("cancel")]
+		public async Task<IActionResult> Cancel(
+			[FromQuery(Name = "id")] int id,
+			CancellationToken cancellationToken = default)
+		{
+			ApplicationUser user = await _userManager.GetUserAsync(User);
+			if (user == null)
+			{
+				throw new ApplicationException($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+			}
+			
+			await _appointmentService.Cancel(id, user.Id, cancellationToken);
+
+			string referrer = Request.Headers[HeaderNames.Referer];
+
+			return Redirect(referrer);
 		}
 	}
 }

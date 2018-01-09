@@ -1,9 +1,89 @@
 ﻿@using ARSFD.Web.Models.AppointmentViewModels
+@using ARSFD.Services
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
 @model AppointmentIndexViewModel
 @{
 	ViewData["Title"] = "Index";
+	ApplicationUser user = await UserManager.GetUserAsync(User);
 }
 
 <div class="row">
-	<h3>Запазени часове</h3>
+	<table class="table table-bordered table-striped table-hover table-selectable">
+		<caption>
+			<h3>
+				Запазени часове
+			</h3>
+		</caption>
+		<thead>
+			<tr>
+				@if (user.Role == RoleType.Doctor)
+				{
+					<th style="white-space: nowrap;">Име на пациента</th>
+				}
+				else
+				{
+					<th style="white-space: nowrap;">Име на доктор</th>
+				}
+				<th style="white-space: nowrap;">Дата и час</th>
+				<th style="white-space: nowrap;">Статус</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody id="free-hours"></tbody>
+		<tbody id="no-hours">
+			@if (Model.Appointments.Count() == 0)
+			{
+				<tr>
+					<td colspan="2">
+						Няма свободни часове.
+					</td>
+				</tr>
+			}
+			else
+			{
+				foreach (AppointmentViewModel appointment in Model.Appointments)
+				{
+					<tr data-id="@appointment.Id">
+						@if (user.Role == RoleType.Doctor)
+						{
+							<td>@appointment.UserName</td>
+							<td>@appointment.Date.ToString("g")</td>
+
+						}
+						else
+						{
+							<td>@appointment.DoctorName</td>
+							<td>@appointment.Date.ToString("g")</td>
+						}
+						<td>@(appointment.CanceledById != null ? "Анулиран" : "Запазен")</td>
+						@if (appointment.CanceledById == null)
+						{
+							<td><button class="btn btn-info btnCancel" data-id="@appointment.Id" data-cancelUrl="@appointment.CancelUrl" role="button">Анулиране</button></td>
+						}
+						else
+						{
+							<td><button disabled class="btn btn-info disabled" data-id="@appointment.Id" data-cancelUrl="@appointment.CancelUrl" role="button">Анулиране</button></td>
+						}
+					</tr>
+				}
+			}
+		</tbody>
+	</table>
 </div>
+<script>
+	$(function () {
+		$(".btnCancel").on("click", function () {
+			var url = $(this).data("cancelurl");
+			var id = $(this).data("id");
+			$.ajax({
+				method: "POST",
+				url: url,
+			})
+				.done(function (msg) {
+					$("tr[data-id='" + id + "']").remove();
+				});
+		});
+	});
+</script>

@@ -2,5 +2,6 @@
 {
 	public class AppointmentIndexViewModel
 	{
+		public AppointmentViewModel[] Appointments { get; set; }
 	}
 }

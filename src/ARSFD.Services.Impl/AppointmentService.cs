@@ -21,6 +21,7 @@ namespace ARSFD.Services.Impl
 
 		public async Task Cancel(
 			int appointmentId,
+			int userId,
 			CancellationToken cancellationToken = default)
 		{
 			try
@@ -33,9 +34,8 @@ namespace ARSFD.Services.Impl
 				{
 					throw new ServiceException($"Appointment with identifier `{appointmentId}` is already canceled.");
 				}
-
-				// TODO: get the current user identifier
-				appointment.CanceledById = null;
+				
+				appointment.CanceledById = userId;
 				appointment.CanceledOn = DateTime.Now;
 
 				await _context.SaveChangesAsync(cancellationToken);
