@@ -1,8 +1,10 @@
 ﻿@using System.Globalization
 @using ARSFD.Services
+@using Microsoft.AspNetCore.Hosting
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+@inject IHostingEnvironment HostingEnvironment
 @{
 	string uiLanguageName = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
 }
@@ -58,7 +60,15 @@
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
-				<a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">ARSFD.Web</a>
+				<a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">
+					ARSFD.Web
+					@{
+						if (HostingEnvironment.IsDevelopment())
+						{
+							<span>(Development)</span>
+						}
+					}
+				</a>
 			</div>
 			<div class="navbar-collapse collapse">
 				<ul class="nav navbar-nav">

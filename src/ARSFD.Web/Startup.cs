@@ -16,17 +16,31 @@ namespace ARSFD.Web
 {
 	public class Startup
 	{
-		public Startup(IConfiguration configuration)
-		{
-			Configuration = configuration;
-		}
+		private IConfigurationRoot Configuration { get; }
 
-		public IConfiguration Configuration { get; }
+		private IHostingEnvironment HostingEnvironment { get; }
+
+		public Startup(IHostingEnvironment env)
+		{
+			IConfigurationBuilder builder = new ConfigurationBuilder()
+				.SetBasePath(basePath: env.ContentRootPath)
+				.AddJsonFile(path: "appsettings.json", optional: false, reloadOnChange: true)
+				.AddJsonFile(path: $"appsettings.{env.EnvironmentName}.json", optional: false, reloadOnChange: true)
+				.AddEnvironmentVariables();
+
+			Configuration = builder.Build();
+
+			HostingEnvironment = env;
+		}
 
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services
-				.AddDbContext<DATABASE.ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+				.AddDbContext<DATABASE.ApplicationDbContext>(options =>
+				{
+					string connectionString = Configuration.GetConnectionString("DefaultConnection");
+					options.UseSqlServer(connectionString);
+				});
 
 			services
 				.AddTransient<IEmailSender, EmailSender>();
@@ -62,6 +76,15 @@ namespace ARSFD.Web
 					config.RequireClaim(ApplicationRole.ClaimType, roleName);
 				});
 			});
+
+			// add in-memory caching
+			services.AddMemoryCache();
+
+			// add response compression middleware
+			services.AddResponseCompression();
+
+			// add response caching
+			services.AddResponseCaching();
 
 			services.AddMvc()
 				.AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver())

@@ -38,15 +38,26 @@
 			</tr>
 		</thead>
 		<tbody>
-			@foreach (DentistListItemViewModel dentist in Model.Dentists)
+			@if (Model.Dentists.Length <= 0)
 			{
 				<tr>
-					<td>@dentist.Name</td>
-					<td>@dentist.City</td>
-					<td>@dentist.Type</td>
-					<td>@dentist.Rating</td>
-					<td><a href="@Url.Action("Single", "Dentist", new { id = dentist.Id })" class="btn btn-info" role="button">Прегред</a></td>
+					<td colspan="5">
+						Няма зъболекари.
+					</td>
 				</tr>
+			}
+			else
+			{
+				@foreach (DentistListItemViewModel dentist in Model.Dentists)
+				{
+					<tr>
+						<td>@dentist.Name</td>
+						<td>@dentist.City</td>
+						<td>@dentist.Type</td>
+						<td>@dentist.Rating</td>
+						<td><a href="@Url.Action("Single", "Dentist", new { id = dentist.Id })" class="btn btn-info" role="button">Прегред</a></td>
+					</tr>
+				}
 			}
 		</tbody>
 	</table>

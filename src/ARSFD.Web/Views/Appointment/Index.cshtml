@@ -33,11 +33,11 @@
 		</thead>
 		<tbody id="free-hours"></tbody>
 		<tbody id="no-hours">
-			@if (Model.Appointments.Count() == 0)
+			@if (Model.Appointments.Length <= 0)
 			{
 				<tr>
-					<td colspan="2">
-						Няма свободни часове.
+					<td colspan="4">
+						Няма запазени часове.
 					</td>
 				</tr>
 			}

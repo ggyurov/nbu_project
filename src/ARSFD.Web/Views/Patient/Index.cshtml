@@ -28,13 +28,24 @@
 			</tr>
 		</thead>
 		<tbody>
-			@foreach (PatientListItemViewModel patient in Model.Patients)
+			@if (Model.Patients.Length <= 0)
 			{
 				<tr>
-					<td>@patient.Name</td>
-					<td>@patient.Rating</td>
-					<td><a href="@Url.Action("Single", "Patient", new { id = patient.Id })" class="btn btn-info" role="button">Прегред</a></td>
+					<td colspan="3">
+						Няма пациенти.
+					</td>
 				</tr>
+			}
+			else
+			{
+				@foreach (PatientListItemViewModel patient in Model.Patients)
+				{
+					<tr>
+						<td>@patient.Name</td>
+						<td>@patient.Rating</td>
+						<td><a href="@Url.Action("Single", "Patient", new { id = patient.Id })" class="btn btn-info" role="button">Прегред</a></td>
+					</tr>
+				}
 			}
 		</tbody>
 	</table>

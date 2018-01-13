@@ -4,16 +4,8 @@
 		<TargetFramework>netcoreapp2.0</TargetFramework>
 		<UserSecretsId>aspnet-ARSFD.Web-9D7AAB05-41A4-4F32-B15C-7164FCC9D6C6</UserSecretsId>
 		<DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
+		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	  <LangVersion>latest</LangVersion>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	  <LangVersion>latest</LangVersion>
-	</PropertyGroup>
-
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
