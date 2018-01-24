@@ -1,28 +1,7 @@
 ﻿@{
 	ViewData["Title"] = "Home Page";
 }
-@{
-	
-		// Test code
-		@*context.Appointments.Add(new Appointment
-		{
-			Date = DateTime.Now,
-			DoctorId = "42c84277-8a97-4ef4-8150-3d4d6d9d9226",
-			UserId = "42c84277-8a97-4ef4-8150-3d4d6d9d9226",
-		});
-		context.SaveChanges();
 
-		foreach (Appointment app in context.Appointments.ToArray())
-		{
-			<h1>
-				@app.Date
-				-
-				@app.DoctorId
-				-
-				@app.UserId
-			</h1>
-			<h2>
-				@context.Users.First(x=>x.Id == app.UserId).UserName
-			</h2>
-		}*@
-}
+<h3>
+	Добре дошли в системата за резервации на часове - `ARSFD`
+</h3>
