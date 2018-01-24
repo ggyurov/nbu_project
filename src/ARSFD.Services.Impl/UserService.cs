@@ -8,7 +8,7 @@ using DATABASE = ARSFD.Database;
 
 namespace ARSFD.Services.Impl
 {
-	public class UserService: IUserService
+	public class UserService : IUserService
 	{
 		private DATABASE.ApplicationDbContext _context;
 
@@ -482,6 +482,29 @@ namespace ARSFD.Services.Impl
 
 				// Update name
 				user.Name = names;
+
+				await _context.SaveChangesAsync(cancellationToken);
+			}
+			catch (Exception ex)
+			{
+				throw new ServiceException($"Failed to update user names.", ex);
+			}
+		}
+
+		public async Task UpdatePassword(int userId, string hash, CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				if (string.IsNullOrEmpty(hash))
+				{
+					throw new ArgumentNullException(nameof(hash));
+				}
+
+				DATABASE.ApplicationUser user = await _context.Users
+					.FirstAsync(x => x.Id == userId, cancellationToken);
+
+				// Update name
+				user.PasswordHash = hash;
 
 				await _context.SaveChangesAsync(cancellationToken);
 			}

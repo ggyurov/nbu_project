@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace ARSFD.Web.Services
 {
-	public class ApplicationUserStore: IUserStore<ApplicationUser>, IUserPasswordStore<ApplicationUser>, IUserClaimStore<ApplicationUser>
+	public class ApplicationUserStore : IUserStore<ApplicationUser>, IUserPasswordStore<ApplicationUser>, IUserClaimStore<ApplicationUser>
 	{
 		private readonly IUserService _userService;
 
@@ -86,9 +86,11 @@ namespace ARSFD.Web.Services
 			return Task.CompletedTask;
 		}
 
-		public Task<IdentityResult> UpdateAsync(ApplicationUser user, CancellationToken cancellationToken)
+		public async Task<IdentityResult> UpdateAsync(ApplicationUser user, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			await _userService.UpdatePassword(user.Id, user.PasswordHash, cancellationToken);
+
+			return IdentityResult.Success;
 		}
 
 		public void Dispose()

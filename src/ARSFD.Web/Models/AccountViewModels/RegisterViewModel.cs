@@ -24,7 +24,7 @@ namespace ARSFD.Web.Models.AccountViewModels
 		public string Email { get; set; }
 
 		[Required(ErrorMessage = "Полето `{0}` е задължително.")]
-		[StringLength(100, ErrorMessage = "`{0}` трябва да бъде от `{1}` до `{2}` символа.", MinimumLength = 6)]
+		[StringLength(100, ErrorMessage = "`{0}` трябва да бъде от `{1}` до `{2}` символа.", MinimumLength = 5)]
 		[DataType(DataType.Password)]
 		[Display(Name = "Парола")]
 		public string Password { get; set; }

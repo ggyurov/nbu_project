@@ -70,5 +70,7 @@ namespace ARSFD.Services
 			int userId,
 			string names,
 			CancellationToken cancellationToken = default);
+
+		Task UpdatePassword(int userId, string hash, CancellationToken cancellationToken = default);
 	}
 }
